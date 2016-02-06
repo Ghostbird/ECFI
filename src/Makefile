@@ -22,7 +22,7 @@ all:
 	@echo "No application yet. Build object files with \"make obj/<objectname>.o\""
 
 doc:
-	@echo "Documentation generation is not implemented yet!"
+	cd .. && doxygen
 
 .PHONY: clean
 
