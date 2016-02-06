@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 /** Modulus calculation for positive divisors.
-    a The dividend
-    b The divisor, cannot be zero
+    - \a a The dividend
+    - \a b The divisor, cannot be zero
 */
 #define MOD(a,b) ((((a) % (b)) + (b)) % (b))
 
