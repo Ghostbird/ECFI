@@ -117,8 +117,8 @@ Functions</h2></td></tr>
 <tr class="separator:aac36d182ea8286d62440474f799a125d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc1743cdff70bf57fa6e23416e849bab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ringbuffer_8c.html#adc1743cdff70bf57fa6e23416e849bab">rb_destroy</a> (<a class="el" href="structringbuffer.html">ringbuffer_t</a> *rbptr)</td></tr>
 <tr class="separator:adc1743cdff70bf57fa6e23416e849bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ba337ef9e96abead4409889567d85fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ringbuffer_8c.html#a9ba337ef9e96abead4409889567d85fc">rb_read</a> (<a class="el" href="structringbuffer.html">ringbuffer_t</a> *rbptr, regval_t *data, uint32_t count)</td></tr>
-<tr class="separator:a9ba337ef9e96abead4409889567d85fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a387b9d6b5a464188b47d56472531fea3"><td class="memItemLeft" align="right" valign="top">regval_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ringbuffer_8c.html#a387b9d6b5a464188b47d56472531fea3">rb_read</a> (<a class="el" href="structringbuffer.html">ringbuffer_t</a> *rbptr, regval_t *data, uint32_t count)</td></tr>
+<tr class="separator:a387b9d6b5a464188b47d56472531fea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A ring buffer structure to store register values. Instead of a read pointer and write pointer it uses indices. NOTE: If the type of the size, read, and write is changed, The arithmetic in must be checked, and casting must be reviewed to verify no wraps can occur. </p>
@@ -204,12 +204,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9ba337ef9e96abead4409889567d85fc"></a>
+<a class="anchor" id="a387b9d6b5a464188b47d56472531fea3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void rb_read </td>
+          <td class="memname">regval_t* rb_read </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structringbuffer.html">ringbuffer_t</a> *&#160;</td>
           <td class="paramname"><em>rbptr</em>, </td>
