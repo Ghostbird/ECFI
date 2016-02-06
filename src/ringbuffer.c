@@ -57,7 +57,7 @@ void rb_destroy(ringbuffer_t *rbptr)
     return;
 }
 
-void rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
+regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
 {
     /* Upcast to avoid uint wrapping when rbptr->read - rbptr->write < 0 */
     int64_t upcast_write = (int64_t)rbptr->write;
@@ -77,4 +77,5 @@ void rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
         /* Update read index. */
         rbptr->read = (uint32_t)((upcast_read + count) % rbptr->size);
     }
+    return data;
 }

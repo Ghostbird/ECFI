@@ -1,2 +1,5 @@
 # Compiled source #
 *.o
+
+# Latex documentation
+doc/latex/*
