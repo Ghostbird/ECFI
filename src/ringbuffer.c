@@ -65,7 +65,7 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
     int64_t upcast_read  = (int64_t)rbptr->read;
     /* The read is only valid if it does not read beyond the write pointer
     and the data pointer is valid */
-    if ((data != NULL) && ((uint32_t)(MOD((upcast_write - upcast_read), rbptr->size)) <= count))
+    if ((data != NULL) && ((uint32_t)(MOD((upcast_write - upcast_read), rbptr->size)) >= count))
     {
         /* Copy register values one by one.
         Use remainder operation to wrap linear memory space.
