@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ringbuffer_2ec',['ringbuffer.c',['../ringbuffer_8c.html',1,'']]]
+  ['ringbuffer_2ec',['ringbuffer.c',['../src_2ringbuffer_8c.html',1,'']]]
 ];
