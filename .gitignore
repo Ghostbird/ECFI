@@ -1,5 +1,5 @@
 # Compiled source #
-*.o
+bin
 
-# Latex documentation
-doc/latex/*
+# Generated documentation
+doc
