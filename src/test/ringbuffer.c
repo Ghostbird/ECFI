@@ -1,14 +1,14 @@
 #include "ringbuffer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
 
 #define TRUE  1
 #define FALSE 0
 
 /* Test normal ring buffer creation */
-char test_create_1024()
+char test_create(uint32_t bufsize)
 {
-    uint32_t bufsize = 1024;
     int success = TRUE;
     printf("Ring buffer creation for %d items...\n",bufsize);
     ringbuffer_t *rb = rb_create(bufsize);
@@ -51,7 +51,7 @@ char test_create_1024()
 
 char test_create_zero()
 {
-    printf("Trying to create invalid ring buffer of zero size...\n");
+    printf("Verifying that it is not possible to create an invalid ring buffer of zero size...\n");
     ringbuffer_t *rb = rb_create(0);
     if (rb != NULL)
     {
@@ -65,6 +65,64 @@ char test_create_zero()
         printf("SUCCESS\n");
         return TRUE;
     }
+}
+
+char test_create_nomem()
+{
+    printf("Testing correct handling of Out of Memory situation during create...\n");
+    char success = TRUE;
+    const uint32_t extramem = 1024;
+    /* Get memory usage */
+    struct rusage ru;
+    if (getrusage(RUSAGE_SELF, &ru) != 0)
+    {
+        printf("Failed to get memory usage!\n");
+        return FALSE;
+    }
+    else
+    {
+        /* Restrict memory usage */
+        struct rlimit rl;
+        /* ru_maxrss is in kiB, RLIMIT_AS is set in bytes. We want to leave 1kiB extra space.*/
+        rl.rlim_cur = (ru.ru_maxrss + 1) * extramem;
+        rl.rlim_max = RLIM_INFINITY;
+        if (setrlimit(RLIMIT_AS, &rl) != 0)
+        {
+            printf("Failed to set memory limit!\n");
+            return FALSE;
+        }
+        ringbuffer_t *rb = rb_create(1);
+        if (rb == NULL)
+        {
+            printf("Failed to create small ring buffer\n");
+            success = FALSE;
+        }
+        else
+        {
+            /* No guarantee this works, hasn't been tested yet. */
+            rb_destroy(rb);
+        }
+        rb = rb_create(1024*1024);
+        if (rb != NULL)
+        {
+            printf("Created ring buffer beyond allowed memory limits\n");
+            /* No guarantee this works, hasn't been tested yet. */
+            rb_destroy(rb);
+            success = FALSE;
+        }
+        /* Remove memory limits */
+        rl.rlim_cur = RLIM_INFINITY;
+        if (setrlimit(RLIMIT_AS, &rl) != 0)
+        {
+            printf("Failed to remove memory limit.\n");
+            return FALSE;
+        }
+    }
+    if (success)
+        printf("SUCCESS\n");
+    else
+        printf("FAILURE\n");
+    return success;
 }
 
 /* Requires that creation of the ring buffer has been tested successfully */
@@ -222,5 +280,5 @@ char test_read()
 
 int main(void)
 {
-    return !(test_create_1024() && test_create_zero() && test_destroy() && test_read());
+    return !(test_create(1) && test_create(1024) && test_create(1024*1024) && test_create_zero() && test_create_nomem() && test_destroy() && test_read());
 }
