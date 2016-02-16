@@ -3,13 +3,15 @@
 /*! The type of a register value is defined as a 32 bit integer. */
 typedef uint32_t regval_t;
 
-/*! A ring buffer structure to store register values.
+/*! This is a ring buffer structure
+
     Instead of a read pointer and write pointer it uses indices.
     NOTE: If the type of the size, read, and write is changed,
     The arithmetic in \file ../src/ringbuffer.c must be checked,
     and casting must be reviewed to verify no wraps can occur.
 */
-struct ringbuffer {
+struct ringbuffer
+{
     /*! The memory location where the ring buffer starts.
     This implies that the buffer ends before memory location:
       start + size * sizeof(regval_t) */
@@ -21,6 +23,7 @@ struct ringbuffer {
     /*! The current write index */
     uint32_t write;
 };
+
 /*! The ringbuffer_t typedef */
 typedef struct ringbuffer ringbuffer_t;
 
@@ -45,3 +48,18 @@ void rb_destroy(ringbuffer_t *rbptr);
     \return        The \a data pointer. Useful in e.g. if (rb_read(..) != NULL)
 */
 regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);
+
+/*! Write \a r0, \a r1, \a r2, \a r3, \a lr, \a pc, \a fp, and \a sp to ring buffer \a rbptr.
+    Write fails silently if the read pointer would be overwritten.
+    This is not desirable and a better solution needs to be found.
+    \param  r0     The value of R0
+    \param  r1     The value of R1
+    \param  r2     The value of R2
+    \param  r3     The value of R3
+    \param  pc     The value of program counter
+    \param  lr     The value of the link register
+    \param  fp     The value of the frame pointer
+    \param  sp     The value of the stack pointer
+    \param  rbptr  A pointer to the ring buffer to write to.
+*/
+void rb_write(regval_t r0, regval_t r1, regval_t r2, regval_t r3, regval_t pc, regval_t lr, regval_t fp, regval_t sp, ringbuffer_t *rbptr);

@@ -7,6 +7,9 @@
 */
 #define MOD(a,b) ((((a) % (b)) + (b)) % (b))
 
+/** Amount of entries in the write operation. */
+#define WRITE_DATACOUNT 8
+
 ringbuffer_t *rb_create(uint32_t bufsize)
 {
     /* Bail out in case of idiotic request
@@ -86,4 +89,28 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
         return NULL;
     }
     return data;
+}
+
+void rb_write(regval_t r0, regval_t r1, regval_t r2, regval_t r3, regval_t pc, regval_t lr, regval_t fp, regval_t sp, ringbuffer_t *rbptr)
+{
+    regval_t data[WRITE_DATACOUNT] = {r0, r1, r2, r3, pc, lr, fp, sp};
+    /* Bail out on stupid input */
+    if (rbptr == NULL)
+        return;
+    /* Upcast to avoid uint wrapping when rbptr->read - rbptr->write < 0 */
+    int64_t upcast_write = (int64_t)rbptr->write;
+    /* Upcast to avoid uint wrapping when rbptr->read + count > UINT32_MAX */
+    int64_t upcast_read  = (int64_t)rbptr->read;
+    if ((uint32_t)(MOD((upcast_read - upcast_write), rbptr->size)) >= WRITE_DATACOUNT)
+    {
+        /* Copy register values one by one.
+        Can maybe be optimised. */
+        for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
+        {
+            rbptr->start[(uint32_t)((upcast_write + i) % rbptr->size)] = data[i];
+        }
+        /* Update write index. */
+        rbptr->write = (uint32_t)((upcast_write + WRITE_DATACOUNT) % rbptr->size);
+    }
+    return;
 }
