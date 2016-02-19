@@ -69,9 +69,10 @@ char test_create_zero()
 
 char test_create_nomem()
 {
+    /* Memory that can still be allocated. Must be fairly large because mmap will need a new page.*/
+    #define EXTRAMEM 8192
     printf("Testing correct handling of Out of Memory situation during create...\n");
     char success = TRUE;
-    const uint32_t extramem = 1024;
     /* Get memory usage */
     struct rusage ru;
     if (getrusage(RUSAGE_SELF, &ru) != 0)
@@ -84,7 +85,7 @@ char test_create_nomem()
         /* Restrict memory usage */
         struct rlimit rl;
         /* ru_maxrss is in kiB, RLIMIT_AS is set in bytes. We want to leave 1kiB extra space.*/
-        rl.rlim_cur = (ru.ru_maxrss + 1) * extramem;
+        rl.rlim_cur = (ru.ru_maxrss + 1) * EXTRAMEM;
         rl.rlim_max = RLIM_INFINITY;
         if (setrlimit(RLIMIT_AS, &rl) != 0)
         {

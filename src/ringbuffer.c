@@ -1,5 +1,8 @@
 #include "ringbuffer.h"
 #include <stdlib.h>
+#include <sys/mman.h>
+#include <errno.h>
+#include <stdio.h>
 
 /** Modulus calculation for positive divisors.
     - \a a The dividend
@@ -10,42 +13,31 @@
 /** Amount of entries in the write operation. */
 #define WRITE_DATACOUNT 8
 
+/** Manually define MAP_ANONYMOUS for C99. NOTE: Is this valid? */
+#define MAP_ANONYMOUS 0x20
+
 ringbuffer_t *rb_create(uint32_t bufsize)
 {
-    /* Bail out in case of idiotic request
-    This exception is necessary because malloc(0) does not return NULL */
+    /* Bail out in case of idiotic request */
     if (bufsize == 0) return NULL;
 
-    /* Try to get memory allocated for the ringbuffer struct. */
-    ringbuffer_t *rb = malloc(sizeof(*rb));
-
-    /* Try to get memory allocated for the buffer. */
-    void *buf = malloc(bufsize * sizeof(regval_t));
+    /* Try to map memory for the data. */
+    ringbuffer_t *rb = (ringbuffer_t *)mmap(NULL, (sizeof(ringbuffer_t) + (bufsize * sizeof(regval_t))), (PROT_READ | PROT_WRITE), (MAP_ANONYMOUS | MAP_SHARED), -1, 0);
 
     /* Check whether memory allocation succeeded. */
-    if (buf != NULL && rb != NULL)
+    if (rb == (ringbuffer_t *)-1)
     {
-        /* Fill the struct with data */
-        rb->size = bufsize;
-        rb->start = buf;
-        rb->read = 0;
-        rb->write = 0;
+        fprintf(stderr,"rb_create(): Failed to map memory; mmap error code %d. Returning NULL\n", errno);
+        return NULL;
     }
     else
     {
-        /* In this case, something's wrong, attempt clean-up. */
-        if (buf != NULL)
-        {
-            /* Free buf if it was allocated. */
-            free(buf);
-        }
-        if (rb != NULL)
-        {
-            /* Free rb if it was allocated. */
-            free(rb);
-            /* Explicitly set it to NULL for the return. */
-            rb = NULL;
-        }
+        /* Fill the struct with data */
+        rb->size = bufsize;
+        /* Calculate the start position of the buffer to lie directly after the “administrative” ringbuffer struct in memory. */
+        rb->start = (regval_t *)(rb + sizeof(ringbuffer_t));
+        rb->read = 0;
+        rb->write = 0;
     }
     /* Return the pointer to the ringbuffer struct. */
     return rb;
@@ -53,13 +45,8 @@ ringbuffer_t *rb_create(uint32_t bufsize)
 
 void rb_destroy(ringbuffer_t *rbptr)
 {
-    /* Free the memory allocated to the buffer. */
-    free(rbptr->start);
-    /* Invalidate start pointer in the struct. */
-    rbptr->start = NULL;
-    /* Free the struct itself. */
-    free(rbptr);
-    return;
+    /* Unmap the memory allocated to the buffer. */
+    munmap(rbptr, rbptr->size + sizeof(ringbuffer_t));
 }
 
 regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)

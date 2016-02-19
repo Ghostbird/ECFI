@@ -44,7 +44,7 @@ tests: $(TESTS)
 objs: $(OBJ)
 
 runtests: tests
-	@for f in $(TBDIR)/*; do echo "==========Testing `basename $$f`=========="; $$f; done
+	@for f in $(TBDIR)/*; do echo "==========Testing `basename $$f`=========="; $$f 2> /dev/null; done
 
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
