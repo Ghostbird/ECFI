@@ -69,8 +69,7 @@ char test_create_zero()
 
 char test_create_nomem()
 {
-    /* Memory that can still be allocated. Must be fairly large because mmap will need a new page.*/
-    #define EXTRAMEM 8192
+    /* Memory that can still be allocated.*/
     printf("Testing correct handling of Out of Memory situation during create...\n");
     char success = TRUE;
     /* Get memory usage */
@@ -82,28 +81,18 @@ char test_create_nomem()
     }
     else
     {
-        /* Restrict memory usage */
+        /* Restrict memory usage to current usage.*/
         struct rlimit rl;
         /* ru_maxrss is in kiB, RLIMIT_AS is set in bytes. We want to leave 1kiB extra space.*/
-        rl.rlim_cur = (ru.ru_maxrss + 1) * EXTRAMEM;
+        rl.rlim_cur = (ru.ru_maxrss * 1024);
         rl.rlim_max = RLIM_INFINITY;
         if (setrlimit(RLIMIT_AS, &rl) != 0)
         {
             printf("Failed to set memory limit!\n");
             return FALSE;
         }
+        /* Now try to create a ring buffer */
         ringbuffer_t *rb = rb_create(1);
-        if (rb == NULL)
-        {
-            printf("Failed to create small ring buffer\n");
-            success = FALSE;
-        }
-        else
-        {
-            /* No guarantee this works, hasn't been tested yet. */
-            rb_destroy(rb);
-        }
-        rb = rb_create(1024*1024);
         if (rb != NULL)
         {
             printf("Created ring buffer beyond allowed memory limits\n");

@@ -9,9 +9,9 @@ TSDIR=$(SDIR)/$(TDIR)
 TBDIR=$(BDIR)/$(TDIR)
 
 CC=gcc
-CFLAGS=-I$(IDIR) -std=c99 -pedantic-errors -Wall -Wextra -Werror
+CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -std=c99 -pedantic-errors -Wall -Wextra -Werror
 
-LIBS=
+LIBS=-lrt
 
 _TESTS=ringbuffer
 TESTS=$(patsubst %,$(TBDIR)/%,$(_TESTS))
@@ -24,11 +24,11 @@ OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 	mkdir -p $(ODIR)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS)
 
 $(TBDIR)/%: $(ODIR)/%.o $(DEPS) $(TSDIR)/%.c
 	mkdir -p $(TBDIR)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
 	mkdir -p $(DDIR)
@@ -44,7 +44,7 @@ tests: $(TESTS)
 objs: $(OBJ)
 
 runtests: tests
-	@for f in $(TBDIR)/*; do echo "==========Testing `basename $$f`=========="; $$f 2> /dev/null; done
+	@for f in $(TBDIR)/*; do echo "==========Testing `basename $$f`=========="; $$f; done
 
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
