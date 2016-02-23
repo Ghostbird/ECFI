@@ -1,19 +1,16 @@
 #include "ringbuffer.h"
-#include <stdlib.h>
 #include <sys/mman.h>    /* shm_open(), shm_unlink() and mmap() */
 #include <sys/stat.h>    /* Mode constraints for shm_open() */
 #include <fcntl.h>       /* Flag values for O_ constants for shm_open() */
 #include <unistd.h>      /* ftruncate() and close() */
 #include <errno.h>       /* errno */
-#include <stdio.h>       /* fprintf() */
+#include <stdio.h>       /* fprintf() and stderr */
 
 /*! Modulus calculation for positive divisors.
     - \a a The dividend
     - \a b The divisor, cannot be zero
 */
 #define MOD(a,b) ((((a) % (b)) + (b)) % (b))
-/*! Define macro for ringbuffer name. TODO: Invent naming scheme so multiple ringbuffers can be used concurrently. At the moment we use O_TRUNC to overwrite.*/
-#define SHMNAME ("/ringbuffer")
 
 /*! This function converts an \var errno set during \func shm_open() or \func shm_unlink() to a human readable error message on \var stderr. */
 void shm_error_msg(int errornum)
@@ -144,86 +141,91 @@ void close_error_msg(int errornum)
 
 ringbuffer_t *rb_create(uint32_t bufsize)
 {
-    /*! Define macro to calculate memory size from bufsize. */
-    #define MEMSIZE (sizeof(ringbuffer_t) + (bufsize * sizeof(regval_t)))
     /* Bail out in case of idiotic request */
     if (bufsize == 0) return NULL;
 
+    ringbuffer_t *rb = NULL;
     /* Open shared memory object. */
-    int shmfd = shm_open(SHMNAME, (O_RDWR | O_CREAT | O_TRUNC), (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+    int shmfd = shm_open(SHMNAME, (O_RDWR | O_CREAT | O_EXCL), (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
     if (shmfd == -1)
     {
-        fprintf(stderr,"shm_open(): Failed to open shared memory object. ");
+        fprintf(stderr,"rb_create(): Failed to open shared memory object. ");
         /* Print error message based on errno. */
         shm_error_msg(errno);
-        fprintf(stderr,"Returning NULL.\n");
+        fprintf(stderr,"Returning NULL immediately.\n");
         return NULL;
-    }
-    /* Truncate file descriptor for shared memory to the desired length.
-    NOTE: ftruncate is not C99, and requires the compiler argument -D_XOPEN_SOURCE=500 */
-    if (ftruncate(shmfd, MEMSIZE) == -1)
-    {
-        /* Handle errors during ftruncate */
-        fprintf(stderr,"ftruncate(): Failed to truncate shared memory object to length %lu.", MEMSIZE);
-        /* Print error messages based on errno. */
-        ftrunc_error_msg(errno);
-        /* Unlink shared memory object. */
-        if (shm_unlink(SHMNAME) == -1)
-        {
-            fprintf(stderr, "Failed to unlink shared memory object when trying to gracefully handle error.\n");
-            /* Print error messages based on errno. */
-            shm_error_msg(errno);
-            fprintf(stderr, "Program state may now be ill-defined.");
-        }
     }
 
-    /* Try to mmap the shared memory file descriptor. */
-    ringbuffer_t *rb = (ringbuffer_t *)mmap(NULL, MEMSIZE, (PROT_READ | PROT_WRITE), MAP_SHARED, shmfd, 0);
-    /* Check whether memory allocation succeeded. */
-    if (rb == (ringbuffer_t *)-1)
+    /* Truncate file descriptor for shared memory to the desired length.
+    NOTE: ftruncate is not C99, and requires the compiler argument -D_XOPEN_SOURCE=500 */
+    if (ftruncate(shmfd, RB_MEMSIZE(bufsize)) == -1)
     {
-        fprintf(stderr,"rb_create(): Failed to map memory of shared object. ");
-        /* Print error message based on errno. */
-        mmap_error_msg(errno);
-        /* Unlink shared memory object */
-        if (shm_unlink(SHMNAME) == -1)
-        {
-            fprintf(stderr, "Failed to unlink shared memory object when trying to gracefully handle error.\n");
-            /* Print error messages based on errno. */
-            shm_error_msg(errno);
-            fprintf(stderr, "Program state may now be ill-defined.\n");
-        }
-        else if (close(shmfd) == -1)
-        {
-            fprintf(stderr,"close(): Failed to close file descriptor to shared memory object");
-            /* Print error message based on errno. */
-            close_error_msg(errno);
-            fprintf(stderr,"Program state may now be ill-defined./n");
-        }
-        fprintf(stderr,"Returning NULL.\n");
-        return NULL;
+        /* Handle errors during ftruncate */
+        fprintf(stderr,"rb_create(): Failed to truncate shared memory object to length %lu. ", RB_MEMSIZE(bufsize));
+        /* Print error messages based on errno. */
+        ftrunc_error_msg(errno);
     }
     else
     {
-        /* Fill the struct with data */
-        rb->size = bufsize;
-        /* Calculate the start position of the buffer to lie directly after the “administrative” ringbuffer struct in memory. */
-        rb->start = (regval_t *)(rb + sizeof(ringbuffer_t));
-        rb->read = 0;
-        rb->write = 0;
+        /* Try to mmap the shared memory file descriptor.
+        Posibilities for optimisation are:
+        - MAP_ANONYMOUS (not backed to file)
+        - MAP_UNINITIALISED (not zeroed before use).
+        - MAP_STACK (map on stack) */
+        rb = (ringbuffer_t *)mmap(NULL, RB_MEMSIZE(bufsize), (PROT_READ | PROT_WRITE), MAP_SHARED, shmfd, 0);
+    	/* Check whether memory allocation succeeded. */
+        if (rb == (ringbuffer_t *)-1)
+    	{
+            fprintf(stderr,"rb_create(): Failed to map memory of shared object. ");
+            /* Print error message based on errno. */
+            mmap_error_msg(errno);
+            /* Reset rb as a signal to the cleanup below. */
+            rb = NULL;
+    	}
+    	else
+        {
+            /* Fill the struct with data */
+            rb->size = bufsize;
+            /* Calculate the start position of the buffer to lie directly after the “administrative” ringbuffer struct in memory. */
+            rb->start = (regval_t *)(rb + sizeof(ringbuffer_t));
+            rb->read = 0;
+            rb->write = 0;
+        }
+    }
+
+    /* Unlink shared memory object if something failed (rb == NULL). */
+    if (rb == NULL && shm_unlink(SHMNAME) == -1)
+    {
+        fprintf(stderr, "rb_create(): Failed to unlink shared memory object when trying to gracefully handle error.\n");
+        /* Print error messages based on errno. */
+        shm_error_msg(errno);
+        fprintf(stderr, "Program state may now be ill-defined.");
+    }
+
+    /* Always close fd, since we con't need it after mmap. See man shm_open(3). */
+    if (close(shmfd) == -1)
+    {
+        fprintf(stderr,"rb_create(): Failed to close file descriptor to shared memory object");
+        /* Print error message based on errno. */
+        close_error_msg(errno);
+        fprintf(stderr,"Program state may now be ill-defined./n");
     }
     /* Return the pointer to the ringbuffer struct. */
     return rb;
-    /* Remove macro */
-    #undef MEMSIZE
 }
 
 void rb_destroy(ringbuffer_t *rbptr)
 {
     /* Unmap the memory allocated to the buffer. */
-    munmap(rbptr, rbptr->size + sizeof(ringbuffer_t));
+    if (munmap(rbptr, rbptr->size + sizeof(ringbuffer_t)) == -1)
+    {
+        fprintf(stderr, "rb_destroy(): Failed to unmap memory. MEMORY LEAK!\n");
+    }
     /* Unlink shared memory object. */
-    shm_unlink(SHMNAME);
+    if (shm_unlink(SHMNAME) == -1)
+    {
+        fprintf(stderr, "rb_destroy(): Failed to unlink shared memory object. Next attempt to shm_open(%s) will fail!\n",SHMNAME);
+    }
 }
 
 regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
@@ -257,13 +259,14 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
 
 void rb_write(regval_t r0, regval_t r1, regval_t r2, regval_t r3, regval_t pc, regval_t lr, regval_t fp, regval_t sp, ringbuffer_t *rbptr)
 {
-    /* Amount of entries in the write operation. */
-    #define WRITE_DATACOUNT 8
-
-    regval_t data[WRITE_DATACOUNT] = {r0, r1, r2, r3, pc, lr, fp, sp};
+    /* Optimise the writing. Better just unroll the write loop and write the arguments explicitly. */
+    regval_t data[] = {r0, r1, r2, r3, pc, lr, fp, sp};
     /* Bail out on stupid input */
     if (rbptr == NULL)
+    {
+        fprintf(stderr, "rb_write(): Write failed, cannot write to NULL pointer");
         return;
+    }
     /* Upcast to avoid uint wrapping when rbptr->read - rbptr->write < 0 */
     int64_t upcast_write = (int64_t)rbptr->write;
     /* Upcast to avoid uint wrapping when rbptr->read + count > UINT32_MAX */
@@ -279,6 +282,9 @@ void rb_write(regval_t r0, regval_t r1, regval_t r2, regval_t r3, regval_t pc, r
         /* Update write index. */
         rbptr->write = (uint32_t)((upcast_write + WRITE_DATACOUNT) % rbptr->size);
     }
+    else
+    {
+        fprintf(stderr, "rb_write(): Write failed, no space in buffer.\n");
+    }
     return;
-    #undef WRITE_DATACOUNT
 }

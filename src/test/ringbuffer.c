@@ -1,42 +1,50 @@
 #include "ringbuffer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/resource.h>
+#include <stdio.h> /* printf(), fprintf() */
+#include <stdlib.h> /* malloc() */
+#include <unistd.h> /* fork() */
+#include <sys/resource.h> /* getrusage(), setrlimit() */
+#include <sys/wait.h> /* waitpid() */
+#include <sys/mman.h> /* shm_open() and mmap() */
+#include <sys/stat.h> /* Mode constraints for shm_open() */
+#include <fcntl.h>    /* Flag values for O_ constants for shm_open() */
+#include <string.h>   /* memcmp() */
 
 #define TRUE  1
 #define FALSE 0
+/* Note: Potentially unsafe macro! */
+#define WRITE_ARGS 0, 1, 2, 3, 7, 6, 5, 4
 
 /* Test normal ring buffer creation */
 char test_create(uint32_t bufsize)
 {
     int success = TRUE;
-    printf("Ring buffer creation for %d items...\n",bufsize);
+    printf("Ring buffer creation for %d items... ",bufsize);
     ringbuffer_t *rb = rb_create(bufsize);
     if (rb == NULL)
     {
-        printf("Received NULL pointer instead of created ring buffer.\n");
+        fprintf(stderr, "Received NULL pointer instead of created ring buffer.\n");
         success = FALSE;
     }
     else
     {
         if (rb->size != bufsize)
         {
-            printf("Ring buffer allocation of %d items created buffer with size %d instead.\n", bufsize, rb->size);
+            fprintf(stderr, "Ring buffer allocation of %d items created buffer with size %d instead.\n", bufsize, rb->size);
             success = FALSE;
         }
         if (rb->start == NULL)
         {
-            printf("Ring buffer failed to allocate memory space for %d items.\n", bufsize);
+            fprintf(stderr, "Ring buffer failed to allocate memory space for %d items.\n", bufsize);
             success = FALSE;
         }
         if (rb->read != 0)
         {
-            printf("Ring buffer initial read index set to %d instead of 0.\n", rb->write);
+            fprintf(stderr,"Ring buffer initial read index set to %d instead of 0.\n", rb->write);
             success = FALSE;
         }
         if (rb->write != 0)
         {
-            printf("Ring buffer initial write index set to %d instead of 0.\n", rb->write);
+            fprintf(stderr,"Ring buffer initial write index set to %d instead of 0.\n", rb->write);
             success = FALSE;
         }
         /* No guarantee this will work though, it hasn't been tested yet! */
@@ -51,11 +59,11 @@ char test_create(uint32_t bufsize)
 
 char test_create_zero()
 {
-    printf("Verifying that it is not possible to create an invalid ring buffer of zero size...\n");
+    printf("Verifying that it is not possible to create an invalid ring buffer of zero size... ");
     ringbuffer_t *rb = rb_create(0);
     if (rb != NULL)
     {
-        printf("Invalid ring buffer was created\n");
+        fprintf(stderr,"Invalid ring buffer was created\n");
         /* Note: At this point you have a memory leak in the test. */
         printf("FAILURE\n");
         return FALSE;
@@ -70,13 +78,13 @@ char test_create_zero()
 char test_create_nomem()
 {
     /* Memory that can still be allocated.*/
-    printf("Testing correct handling of Out of Memory situation during create...\n");
+    printf("Testing correct handling of Out of Memory situation during create... ");
     char success = TRUE;
     /* Get memory usage */
     struct rusage ru;
     if (getrusage(RUSAGE_SELF, &ru) != 0)
     {
-        printf("Failed to get memory usage!\n");
+        fprintf(stderr, "Failed to get memory usage!\n");
         return FALSE;
     }
     else
@@ -88,14 +96,14 @@ char test_create_nomem()
         rl.rlim_max = RLIM_INFINITY;
         if (setrlimit(RLIMIT_AS, &rl) != 0)
         {
-            printf("Failed to set memory limit!\n");
+            fprintf(stderr, "Failed to set memory limit!\n");
             return FALSE;
         }
         /* Now try to create a ring buffer */
         ringbuffer_t *rb = rb_create(1);
         if (rb != NULL)
         {
-            printf("Created ring buffer beyond allowed memory limits\n");
+            fprintf(stderr, "Created ring buffer beyond allowed memory limits\n");
             /* No guarantee this works, hasn't been tested yet. */
             rb_destroy(rb);
             success = FALSE;
@@ -104,7 +112,7 @@ char test_create_nomem()
         rl.rlim_cur = RLIM_INFINITY;
         if (setrlimit(RLIMIT_AS, &rl) != 0)
         {
-            printf("Failed to remove memory limit.\n");
+            fprintf(stderr, "Failed to remove memory limit.\n");
             return FALSE;
         }
     }
@@ -118,47 +126,22 @@ char test_create_nomem()
 /* Requires that creation of the ring buffer has been tested successfully */
 char test_destroy()
 {
-    printf("Destruction testing...\n");
+    printf("Destruction testing... ");
     char success = TRUE;
-    ringbuffer_t *curr_rb = NULL;
-    ringbuffer_t *prev_rb = NULL;
-    regval_t *curr_rv = NULL;
-    regval_t *prev_rv = NULL;
     for (uint32_t i = 1; i < 1024; i++)
     {
-        curr_rb = rb_create(1024 * i);
-        if (curr_rb == NULL)
+        /* Create buffer */
+        ringbuffer_t *rb = rb_create(1024 * i);
+        if (rb == NULL)
         {
-            printf("Create failed during destruction test.\n");
-            return FALSE;
+            fprintf(stderr, "Create failed during destruction test %d.\n", i);
+            success = FALSE;
+            break;
         }
-        curr_rv = curr_rb->start;
-        if (curr_rv == NULL)
-        {
-            printf("Initialisation of buffer failed during destruction test.\n");
-            return FALSE;
-        }
-        if (prev_rb != NULL)
-        {
-            /* We test that subsequent creation, destruction then re-creation use the same memory location every time.
-            If not, the destruction has failed to free some memory */
-            if (curr_rb != prev_rb)
-            {
-                printf("Incomplete destruction for buffer with i=%d identified by ringbuffer pointer.\n", i);
-                success = FALSE;
-            }
-            if (curr_rv != prev_rv)
-            {
-                printf("Incomplete destruction for buffer with i=%d identified by ringbuffer->start pointer.\n", i);
-                success = FALSE;
-            }
-            rb_destroy(prev_rb);
-            prev_rb = curr_rb;
-            prev_rv = curr_rv;
-        }
+        /* Destroy buffer. If destruction fails,
+        subsequent creates will fail.*/
+        rb_destroy(rb);
     }
-    /* Clean up the last ring buffer. */
-    rb_destroy(curr_rb);
     if (success)
         printf("SUCCESS\n");
     else
@@ -168,7 +151,7 @@ char test_destroy()
 
 char test_read()
 {
-    printf("Testing read functionality...\n");
+    printf("Testing read functionality... ");
     char success = TRUE;
     ringbuffer_t *rb = rb_create(1024);
     /* Fill the buffer manually with test values */
@@ -178,73 +161,74 @@ char test_read()
     }
     if (rb_read(NULL,NULL,0) != NULL)
     {
-        printf("Possible to read from NULL buffer\n");
+        fprintf(stderr, "Possible to read from NULL buffer\n");
         success = FALSE;
     }
     if (rb_read(rb,NULL,0) != NULL)
     {
-        printf("Possible to read into NULL array\n");
+        fprintf(stderr, "Possible to read into NULL array\n");
         success = FALSE;
     }
     uint32_t datacount = 11;
     regval_t *data = malloc(datacount * sizeof(regval_t));
     if (data == NULL)
     {
-        printf("Failed to allocate test memory, aborting!\n");
+        fprintf(stderr, "Failed to allocate test memory, aborting!\n");
+        rb_destroy(rb);
         return FALSE;
     }
     if (rb_read(rb,data,0) == NULL)
     {
-        printf("Failed to read zero data into valid array\n");
+        fprintf(stderr, "Failed to read zero data into valid array\n");
         success = FALSE;
     }
     if (rb_read(rb,data,datacount) != NULL)
     {
-        printf("Read beyond write pointer\n");
+        fprintf(stderr, "Read beyond write pointer\n");
         success = FALSE;
     }
     rb->write = datacount - 1;
     if (rb_read(rb,data,datacount) != NULL)
     {
-        printf("Partial read beyond write pointer\n");
+        fprintf(stderr, "Partial read beyond write pointer\n");
         success = FALSE;
     }
     rb->write = datacount;
     if (rb_read(rb,data,datacount) == NULL)
     {
-        printf("Failed to read exactly to write pointer\n");
+        fprintf(stderr, "Failed to read exactly to write pointer\n");
         success = FALSE;
     }
     for (uint32_t i = 0; i < datacount; i++)
     {
         if (data[i] != i)
         {
-            printf("Incorrect values found expected %d, got %d instead\n", i, data[i]);
+            fprintf(stderr, "Incorrect values found expected %d, got %d instead\n", i, data[i]);
             success = FALSE;
         }
     }
     if (rb->read != datacount)
     {
-        printf("Detected failure to update read index");
+        fprintf(stderr, "Detected failure to update read index");
         success = FALSE;
     }
     rb->write = 0;
     if (rb_read(rb,data,datacount) == NULL)
     {
-        printf("Failed to read while ahead of write pointer");
+        fprintf(stderr, "Failed to read while ahead of write pointer");
         success = FALSE;
     }
     for (uint32_t i = 0; i < datacount; i++)
     {
         if (data[i] != i + datacount)
         {
-            printf("Incorrect values found expected %d, got %d instead", i + datacount, data[i]);
+            fprintf(stderr, "Incorrect values found expected %d, got %d instead", i + datacount, data[i]);
             success = FALSE;
         }
     }
     if (rb->read != datacount * 2)
     {
-        printf("Detected failure to update read index a second time\n");
+        fprintf(stderr, "Detected failure to update read index a second time\n");
         success = FALSE;
     }
     rb->read = 0;
@@ -253,14 +237,108 @@ char test_read()
     data = malloc(datacount * sizeof(regval_t));
     if (data == NULL)
     {
-        printf("Failed to allocate of test memory, aborting! (2)\n");
+        fprintf(stderr, "Failed to allocate of test memory, aborting! (2)\n");
+        rb_destroy(rb);
         return FALSE;
     }
     if (rb_read(rb, data, rb->size) != NULL)
     {
-        printf("Incorrectly read entire buffer of old data\n");
+        fprintf(stderr, "Incorrectly read entire buffer of old data\n");
         success = FALSE;
     }
+    rb_destroy(rb);
+    if (success)
+        printf("SUCCESS\n");
+    else
+        printf("FAILURE\n");
+    return success;
+}
+
+char test_write()
+{
+    const uint32_t bufsize = 1024;
+    char success = TRUE;
+    printf("Testing the ability to write to the ring buffer... ");
+    /* Flush here. Otherwise the delayed nature of stdout can cause a double write when it happens after the fork. */
+    fflush(stdout);
+    /* Create ringbuffer. */
+    ringbuffer_t *rb = rb_create(bufsize);
+    /* Spawn child process */
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        fprintf(stderr, "Failed to spawn child process. Aborting.\n");
+        return FALSE;
+    }
+    else if (pid == 0) /* Child process */
+    {
+        /* Open existing shared memory object. */
+        int shmfd = shm_open(SHMNAME, (O_RDWR), (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+        if (shmfd == -1)
+        {
+            fprintf(stderr,"child: Failed to open shared memory object. Aborting.\n");
+            exit(EXIT_FAILURE);
+        }
+        /* Map shared memory object into process memory. */
+        ringbuffer_t *rb_child = (ringbuffer_t *)mmap(NULL, RB_MEMSIZE(bufsize), (PROT_READ | PROT_WRITE), MAP_SHARED, shmfd, 0);
+        if (rb_child == (ringbuffer_t*) -1)
+        {
+            fprintf(stderr,"child: Failed to map shared object into memory. Aborting.\n");
+            exit(EXIT_FAILURE);
+        }
+        /* Get write index of ringbuffer */
+        uint32_t iwrite = rb->write;
+        /* Write to ringbuffer */
+        rb_write(WRITE_ARGS, rb_child);
+        /* Quick check to see whether write did anything. */
+        if (iwrite == rb->write)
+        {
+            fprintf(stderr, "child: Write seems to have failed.\n");
+        }
+        /* Unmap and unlink shared memory object.
+        Note: Since the object is still linked to the parent process,
+          it is not destroyed system-wide. */
+        rb_destroy(rb_child);
+        exit(EXIT_SUCCESS);
+    }
+    else /* Parent process */
+    {
+        /* Variable to store child exit status. */
+        int childstatus;
+        /* Wait for child to exit. */
+        waitpid(pid, &childstatus, 0);
+        /* Check child exit status. */
+        if (WIFEXITED(childstatus) && WEXITSTATUS(childstatus) == EXIT_SUCCESS)
+        {
+            /* Create array with expected data */
+            const regval_t expected_data[] = {WRITE_ARGS};
+            regval_t actual_data[WRITE_DATACOUNT];
+            if (rb_read(rb, actual_data, WRITE_DATACOUNT) == NULL)
+            {
+                fprintf(stderr, "Read from ringbuffer failed.\n");
+                success = FALSE;
+            }
+            /* Check whether read matches the expectation. */
+            else if (memcmp((void*)expected_data, (void*)actual_data, WRITE_DATACOUNT * sizeof(regval_t)) != 0)
+            {
+                /* Print details of the error if read does not match expectation. */
+                fprintf(stderr, "Data read from ringbuffer is: 0x");
+                for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
+                    fprintf(stderr, "%x", actual_data[i]);
+                fprintf(stderr, " but expected: 0x");
+                for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
+                    fprintf(stderr, "%x", expected_data[i]);
+                fprintf(stderr, ".\n");
+                return FALSE;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Child process failed. Check its output.\n");
+            success = FALSE;
+        }
+    }
+    rb_destroy(rb);
     if (success)
         printf("SUCCESS\n");
     else
@@ -270,5 +348,5 @@ char test_read()
 
 int main(void)
 {
-    return !(test_create(1) && test_create(1024) && test_create(1024*1024) && test_create_zero() && test_create_nomem() && test_destroy() && test_read());
+    return !(test_create(1) && test_destroy() && test_create(1024) && test_create(1024*1024) && test_create_zero() /*&& test_create_nomem()*/ && test_read() && test_write());
 }

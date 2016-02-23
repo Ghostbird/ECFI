@@ -1,5 +1,15 @@
 #include <inttypes.h>
 
+/*! Define macro for ringbuffer name.
+TODO: Invent naming scheme so multiple ringbuffers can be used concurrently.*/
+#define SHMNAME ("/ringbuffer")
+
+/* Amount of entries in the write operation. */
+#define WRITE_DATACOUNT 8
+
+/* Size in memory of a ring buffer with x entries. */
+#define RB_MEMSIZE(size) (sizeof(ringbuffer_t) + (sizeof(regval_t)*size)) 
+
 /*! The type of a register value is defined as a 32 bit integer. */
 typedef uint32_t regval_t;
 
