@@ -1,4 +1,5 @@
 #include "ringbuffer.h"
+#include "errors.h"
 #include <stdio.h> /* printf(), fprintf() */
 #include <stdlib.h> /* malloc() */
 #include <unistd.h> /* fork() */
@@ -12,14 +13,18 @@
 #define TRUE  1
 #define FALSE 0
 /* Note: Potentially unsafe macro! */
-#define WRITE_ARGS 0, 1, 2, 3, 7, 6, 5, 4
+#define WRITE_ARGS 5, 12, 1337, 8430
+
+#define BUFNAME "testbuffer"
 
 /* Test normal ring buffer creation */
 char test_create(uint32_t bufsize)
 {
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
     int success = TRUE;
     printf("Ring buffer creation for %d items... ",bufsize);
-    ringbuffer_t *rb = rb_create(bufsize);
+    ringbuffer_t *rb = rb_create(bufsize, BUFNAME);
     if (rb == NULL)
     {
         fprintf(stderr, "Received NULL pointer instead of created ring buffer.\n");
@@ -48,7 +53,7 @@ char test_create(uint32_t bufsize)
             success = FALSE;
         }
         /* No guarantee this will work though, it hasn't been tested yet! */
-        rb_destroy(rb);
+        rb_destroy(rb, BUFNAME);
     }
     if (success)
         printf("SUCCESS\n");
@@ -59,12 +64,38 @@ char test_create(uint32_t bufsize)
 
 char test_create_zero()
 {
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
     printf("Verifying that it is not possible to create an invalid ring buffer of zero size... ");
-    ringbuffer_t *rb = rb_create(0);
+    ringbuffer_t *rb = rb_create(0, BUFNAME);
     if (rb != NULL)
     {
         fprintf(stderr,"Invalid ring buffer was created\n");
+        /* Try to destroy the invalid buffer. May fail. */
+        rb_destroy(rb, BUFNAME);
         /* Note: At this point you have a memory leak in the test. */
+        printf("FAILURE\n");
+        return FALSE;
+    }
+    else
+    {
+        printf("SUCCESS\n");
+        return TRUE;
+    }
+}
+
+char test_create_noname()
+{
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
+    printf("Verifying that it is not possible to create an invalid ring buffer without a name... ");
+    ringbuffer_t *rb = rb_create(0, "");
+    if (rb != NULL)
+    {
+        fprintf(stderr,"Invalid ring buffer was created\n");
+        /* Try to destroy the invalid buffer. May fail. */
+        rb_destroy(rb, "");
+        /* Note: At this point you may have a memory leak in the test. */
         printf("FAILURE\n");
         return FALSE;
     }
@@ -77,6 +108,8 @@ char test_create_zero()
 
 char test_create_nomem()
 {
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
     /* Memory that can still be allocated.*/
     printf("Testing correct handling of Out of Memory situation during create... ");
     char success = TRUE;
@@ -100,12 +133,12 @@ char test_create_nomem()
             return FALSE;
         }
         /* Now try to create a ring buffer */
-        ringbuffer_t *rb = rb_create(1);
+        ringbuffer_t *rb = rb_create(1, BUFNAME);
         if (rb != NULL)
         {
             fprintf(stderr, "Created ring buffer beyond allowed memory limits\n");
             /* No guarantee this works, hasn't been tested yet. */
-            rb_destroy(rb);
+            rb_destroy(rb, BUFNAME);
             success = FALSE;
         }
         /* Remove memory limits */
@@ -126,12 +159,14 @@ char test_create_nomem()
 /* Requires that creation of the ring buffer has been tested successfully */
 char test_destroy()
 {
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
     printf("Destruction testing... ");
     char success = TRUE;
     for (uint32_t i = 1; i < 1024; i++)
     {
         /* Create buffer */
-        ringbuffer_t *rb = rb_create(1024 * i);
+        ringbuffer_t *rb = rb_create(1024 * i, BUFNAME);
         if (rb == NULL)
         {
             fprintf(stderr, "Create failed during destruction test %d.\n", i);
@@ -140,7 +175,7 @@ char test_destroy()
         }
         /* Destroy buffer. If destruction fails,
         subsequent creates will fail.*/
-        rb_destroy(rb);
+        rb_destroy(rb, BUFNAME);
     }
     if (success)
         printf("SUCCESS\n");
@@ -151,9 +186,11 @@ char test_destroy()
 
 char test_read()
 {
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
     printf("Testing read functionality... ");
     char success = TRUE;
-    ringbuffer_t *rb = rb_create(1024);
+    ringbuffer_t *rb = rb_create(1024, BUFNAME);
     /* Fill the buffer manually with test values */
     for (uint32_t i = 0; i < rb->size; i++)
     {
@@ -174,7 +211,7 @@ char test_read()
     if (data == NULL)
     {
         fprintf(stderr, "Failed to allocate test memory, aborting!\n");
-        rb_destroy(rb);
+        rb_destroy(rb, BUFNAME);
         return FALSE;
     }
     if (rb_read(rb,data,0) == NULL)
@@ -238,7 +275,7 @@ char test_read()
     if (data == NULL)
     {
         fprintf(stderr, "Failed to allocate of test memory, aborting! (2)\n");
-        rb_destroy(rb);
+        rb_destroy(rb, BUFNAME);
         return FALSE;
     }
     if (rb_read(rb, data, rb->size) != NULL)
@@ -246,7 +283,7 @@ char test_read()
         fprintf(stderr, "Incorrectly read entire buffer of old data\n");
         success = FALSE;
     }
-    rb_destroy(rb);
+    rb_destroy(rb, BUFNAME);
     if (success)
         printf("SUCCESS\n");
     else
@@ -256,13 +293,16 @@ char test_read()
 
 char test_write()
 {
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    fflush(NULL);
     const uint32_t bufsize = 1024;
     char success = TRUE;
     printf("Testing the ability to write to the ring buffer... ");
-    /* Flush here. Otherwise the delayed nature of stdout can cause a double write when it happens after the fork. */
-    fflush(stdout);
     /* Create ringbuffer. */
-    ringbuffer_t *rb = rb_create(bufsize);
+    ringbuffer_t *rb = rb_create(bufsize, BUFNAME);
+    /* Flush here. Otherwise the buffered nature of stdout/stderr can cause double writes.
+       This is because fork(3) copies the output buffers to the child process. */
+    fflush(NULL);
     /* Spawn child process */
     pid_t pid = fork();
     if (pid == -1)
@@ -273,7 +313,7 @@ char test_write()
     else if (pid == 0) /* Child process */
     {
         /* Open existing shared memory object. */
-        int shmfd = shm_open(SHMNAME, (O_RDWR), (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+        int shmfd = shm_open(BUFNAME, (O_RDWR), (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
         if (shmfd == -1)
         {
             fprintf(stderr,"child: Failed to open shared memory object. Aborting.\n");
@@ -298,7 +338,7 @@ char test_write()
         /* Unmap and unlink shared memory object.
         Note: Since the object is still linked to the parent process,
           it is not destroyed system-wide. */
-        rb_destroy(rb_child);
+        rb_destroy(rb_child, BUFNAME);
         exit(EXIT_SUCCESS);
     }
     else /* Parent process */
@@ -329,7 +369,7 @@ char test_write()
                 for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
                     fprintf(stderr, "%x", expected_data[i]);
                 fprintf(stderr, ".\n");
-                return FALSE;
+                success = FALSE;
             }
         }
         else
@@ -338,7 +378,7 @@ char test_write()
             success = FALSE;
         }
     }
-    rb_destroy(rb);
+    rb_destroy(rb, BUFNAME);
     if (success)
         printf("SUCCESS\n");
     else
@@ -348,5 +388,5 @@ char test_write()
 
 int main(void)
 {
-    return !(test_create(1) && test_destroy() && test_create(1024) && test_create(1024*1024) && test_create_zero() /*&& test_create_nomem()*/ && test_read() && test_write());
+    return !(test_create(1) && test_destroy() && test_create(1024) && test_create(1024*1024) && test_create_zero() && test_create_noname() && test_create_nomem() && test_read() && test_write());
 }

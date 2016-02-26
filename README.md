@@ -28,4 +28,4 @@ To compile and test all current functionality, run:
 - Don't use array assignment and for loop in rb\_write(). Unroll the loop and skip the array.
 
 ## Known issues:
-- Write doesn't work, always thinks it's out of space.
+- rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
