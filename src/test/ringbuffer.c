@@ -283,6 +283,7 @@ char test_read()
         fprintf(stderr, "Incorrectly read entire buffer of old data\n");
         success = FALSE;
     }
+    free(data);
     rb_destroy(rb, BUFNAME);
     if (success)
         printf("SUCCESS\n");
