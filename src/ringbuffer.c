@@ -129,32 +129,26 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
     return data;
 }
 
-void rb_write(regval_t r0, regval_t r1, regval_t r2, regval_t r3, ringbuffer_t *rbptr)
+void rb_write(const regval_t data[8], ringbuffer_t *rbptr)
 {
-    /* Bail out on stupid input */
-    if (rbptr == NULL)
-    {
-        fprintf(stderr, "rb_write(): Write failed, cannot write to NULL pointer");
-        return;
-    }
-    /* Upcast to avoid uint wrapping when rbptr->read - rbptr->write < 0 */
-    int64_t upcast_write = (int64_t)rbptr->write;
-    /* Upcast to avoid uint wrapping when rbptr->read + count > UINT32_MAX */
-    int64_t upcast_read  = (int64_t)rbptr->read;
-    if (upcast_read == upcast_write || (uint32_t)(MOD((upcast_read - upcast_write), rbptr->size)) >= WRITE_DATACOUNT)
-    {
-        /* Copy arguments to ringbuffer.*/
-        rbptr->start[(uint32_t)((upcast_write + 0) % rbptr->size)] = r0;
-        rbptr->start[(uint32_t)((upcast_write + 1) % rbptr->size)] = r1;
-        rbptr->start[(uint32_t)((upcast_write + 2) % rbptr->size)] = r2;
-        rbptr->start[(uint32_t)((upcast_write + 3) % rbptr->size)] = r3;
-        /* Update write index. */
-        rbptr->write = (uint32_t)((upcast_write + WRITE_DATACOUNT) % rbptr->size);
-    }
-    else
-    {
-        fprintf(stderr, "rb_write(): Write failed, no space in buffer.\n");
-    }
+    /* Copy arguments to ringbuffer.*/
+    rbptr->start[rbptr->write + 0] = data[0];
+    rbptr->start[rbptr->write + 1] = data[1];
+    rbptr->start[rbptr->write + 2] = data[2];
+    rbptr->start[rbptr->write + 3] = data[3];
+    rbptr->start[rbptr->write + 4] = data[4];
+    rbptr->start[rbptr->write + 5] = data[5];
+    rbptr->start[rbptr->write + 6] = data[6];
+    rbptr->start[rbptr->write + 7] = data[7];
+    /* Update write index. */
+    rbptr->write += WRITE_DATACOUNT;
+    /* Fix write index if it's beyond the size of the buffer. */
+    if (rbptr->write == rbptr->size)
+	rbptr->write -= rbptr->size;
+    /* Fix read index if it is an overwrite.
+    It will point to one write operation in advance of the write index. */
+    if (rbptr->write == rbptr->read)
+	rbptr->read += WRITE_DATACOUNT;
     return;
 }
 

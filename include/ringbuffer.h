@@ -1,10 +1,10 @@
 #include <inttypes.h>
 
-/* Amount of regval_t entries in the write operation. */
-#define WRITE_DATACOUNT 4
+/* Amount of regval_t entries in a buffer field. */
+#define WRITE_DATACOUNT 8
 
-/* Size in memory of a ring buffer with x entries. */
-#define RB_MEMSIZE(size) (sizeof(ringbuffer_t) + (sizeof(regval_t)*size)) 
+/* Size in memory of a ring buffer with WRITE_DATACOUNT×size entries. */
+#define RB_MEMSIZE(size) (sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT))
 
 /*! Modulus calculation for positive divisors.
     - \a a The dividend
@@ -63,13 +63,12 @@ void rb_destroy(ringbuffer_t *rbptr, const char *bufname);
 */
 regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);
 
-/*! Write \a r0, \a r1, \a r2, \a r3, \a lr, \a pc, \a fp, and \a sp to ring buffer \a rbptr.
-    Write fails silently if the read pointer would be overwritten.
-    This is not desirable and a better solution needs to be found.
-    \param  r0     The value of R0
-    \param  r1     The value of R1
-    \param  r2     The value of R2
-    \param  r3     The value of R3
-    \param  rbptr  A pointer to the ring buffer to write to.
+/*! Write an array of WRITE_DATACOUNT items to ring buffer \a rbptr.
+    Behaviour is undefined if rbptr == NULL.
+    This operation relies on the fact that the size of the ringbuffer is a multiple of the WRITE_DATACOUNT.
+    This is guaranteed by using RB_MEMSIZE to calculate the size of the buffer at creation time.
+    If this operation overwrites the read pointer it will increment the read pointer by WRITE_DATACOUNT.
+    \param  data an array of data to write.
+    \param  rbptr  A pointer to the ring buffer to write to. CANNOT BE NULL.
 */
-void rb_write(regval_t r0, regval_t r1, regval_t r2, regval_t r3, ringbuffer_t *rbptr);
+void rb_write(const regval_t data[8], ringbuffer_t *rbptr);

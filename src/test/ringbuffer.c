@@ -12,8 +12,6 @@
 
 #define TRUE  1
 #define FALSE 0
-/* Note: Potentially unsafe macro! */
-#define WRITE_ARGS 5, 12, 1337, 8430
 
 #define BUFNAME "testbuffer"
 
@@ -295,6 +293,7 @@ char test_read()
 char test_write()
 {
     /* Flush to prevent stdout and stderr to desynchronise between test cases. */
+    const regval_t testdata[WRITE_DATACOUNT] = {5, 12, 1337, 8430, 123, 589, 276, 1};
     fflush(NULL);
     const uint32_t bufsize = 1024;
     char success = TRUE;
@@ -330,7 +329,7 @@ char test_write()
         /* Get write index of ringbuffer */
         uint32_t iwrite = rb->write;
         /* Write to ringbuffer */
-        rb_write(WRITE_ARGS, rb_child);
+        rb_write(testdata, rb_child);
         /* Quick check to see whether write did anything. */
         if (iwrite == rb->write)
         {
@@ -351,8 +350,7 @@ char test_write()
         /* Check child exit status. */
         if (WIFEXITED(childstatus) && WEXITSTATUS(childstatus) == EXIT_SUCCESS)
         {
-            /* Create array with expected data */
-            const regval_t expected_data[] = {WRITE_ARGS};
+            /* Create array for actual read data data */
             regval_t actual_data[WRITE_DATACOUNT];
             if (rb_read(rb, actual_data, WRITE_DATACOUNT) == NULL)
             {
@@ -360,7 +358,7 @@ char test_write()
                 success = FALSE;
             }
             /* Check whether read matches the expectation. */
-            else if (memcmp((void*)expected_data, (void*)actual_data, WRITE_DATACOUNT * sizeof(regval_t)) != 0)
+            else if (memcmp((void*)testdata, (void*)actual_data, WRITE_DATACOUNT * sizeof(regval_t)) != 0)
             {
                 /* Print details of the error if read does not match expectation. */
                 fprintf(stderr, "Data read from ringbuffer is: 0x");
@@ -368,7 +366,7 @@ char test_write()
                     fprintf(stderr, "%x", actual_data[i]);
                 fprintf(stderr, " but expected: 0x");
                 for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
-                    fprintf(stderr, "%x", expected_data[i]);
+                    fprintf(stderr, "%x", testdata[i]);
                 fprintf(stderr, ".\n");
                 success = FALSE;
             }
