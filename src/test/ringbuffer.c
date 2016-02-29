@@ -361,13 +361,13 @@ char test_write()
             else if (memcmp((void*)testdata, (void*)actual_data, WRITE_DATACOUNT * sizeof(regval_t)) != 0)
             {
                 /* Print details of the error if read does not match expectation. */
-                fprintf(stderr, "Data read from ringbuffer is: 0x");
+                fprintf(stderr, "Data read from ringbuffer is:\n0x");
                 for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
-                    fprintf(stderr, "%x", actual_data[i]);
-                fprintf(stderr, " but expected: 0x");
+                    fprintf(stderr, "%08x", actual_data[i]);
+                fprintf(stderr, "\nData expected in ringbuffer was:\n0x");
                 for (uint32_t i = 0; i < WRITE_DATACOUNT; i++)
-                    fprintf(stderr, "%x", testdata[i]);
-                fprintf(stderr, ".\n");
+                    fprintf(stderr, "%08x", testdata[i]);
+                fprintf(stderr, "\n");
                 success = FALSE;
             }
         }

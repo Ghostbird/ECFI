@@ -6,6 +6,7 @@
 #include <unistd.h>      /* ftruncate() and close() */
 #include <errno.h>       /* errno */
 #include <stdio.h>       /* fprintf() and stderr */
+#include <string.h>      /* memcpy() */
 
 ringbuffer_t *rb_create(uint32_t bufsize, const char *bufname)
 {
@@ -132,14 +133,7 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
 void rb_write(const regval_t data[8], ringbuffer_t *rbptr)
 {
     /* Copy arguments to ringbuffer.*/
-    rbptr->start[rbptr->write + 0] = data[0];
-    rbptr->start[rbptr->write + 1] = data[1];
-    rbptr->start[rbptr->write + 2] = data[2];
-    rbptr->start[rbptr->write + 3] = data[3];
-    rbptr->start[rbptr->write + 4] = data[4];
-    rbptr->start[rbptr->write + 5] = data[5];
-    rbptr->start[rbptr->write + 6] = data[6];
-    rbptr->start[rbptr->write + 7] = data[7];
+    memcpy((void*) &(rbptr->start[rbptr->write]), (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
     /* Update write index. */
     rbptr->write += WRITE_DATACOUNT;
     /* Fix write index if it's beyond the size of the buffer. */
