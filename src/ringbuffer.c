@@ -7,6 +7,7 @@
 #include <errno.h>       /* errno */
 #include <stdio.h>       /* fprintf() and stderr */
 #include <string.h>      /* memcpy() */
+#include <inttypes.h>    /* Platform independent printf format specifier macros */
 
 ringbuffer_t *rb_create(uint32_t bufsize, const char *bufname)
 {
@@ -30,7 +31,7 @@ ringbuffer_t *rb_create(uint32_t bufsize, const char *bufname)
     if (ftruncate(shmfd, RB_MEMSIZE(bufsize)) == -1)
     {
         /* Handle errors during ftruncate */
-        fprintf(stderr,"rb_create(): Failed to truncate shared memory object to length %lu. ", RB_MEMSIZE(bufsize));
+        fprintf(stderr,"rb_create(): Failed to truncate shared memory object to length %" PRIu32 ".\n", RB_MEMSIZE(bufsize));
         /* Print error messages based on errno. */
         ftrunc_error_msg(errno);
     }

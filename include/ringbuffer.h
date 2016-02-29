@@ -3,8 +3,9 @@
 /* Amount of regval_t entries in a buffer field. */
 #define WRITE_DATACOUNT 8
 
-/* Size in memory of a ring buffer with WRITE_DATACOUNT×size entries. */
-#define RB_MEMSIZE(size) (sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT))
+/* Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
+Take care that size is not allowed to be so big that it overflows the uint32_t maximum. */
+#define RB_MEMSIZE(size) ((sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT)))
 
 /*! Modulus calculation for positive divisors.
     - \a a The dividend
