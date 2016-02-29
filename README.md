@@ -29,3 +29,4 @@ To compile and test all current functionality, run:
 
 ## Known issues:
 - rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
+- If we load the ringbuffer library into an application, will our mmap conflict with its own memory allocation?
