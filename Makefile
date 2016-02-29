@@ -75,6 +75,9 @@ shlibs: $(SHLIB)
 runtests: tests
 	@for f in $(TBDIR)/*; do echo "==========Testing `basename $$f`=========="; LD_PRELOAD=$(SHLIB) $$f; done
 
+valgrind: tests
+	@for f in $(TBDIR)/*; do echo "==========Running Valgrind on `basename $$f`=========="; LD_PRELOAD=$(SHLIB) LD_PRELOAD=$(SHLIB) valgrind --leak-check=full $$f; done
+
 # Remove all generated files.
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
