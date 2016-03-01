@@ -52,15 +52,18 @@ $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIBDIR)/lib%.so
 	mkdir -p $(TBDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) -l$(notdir $@)
 
+$(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(BDIR)
+	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+
+.PHONY: all tests objs shlibs runtests clean install
+
+all: bin/cfi-checker
+
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
 	mkdir -p $(DDIR)
 	doxygen
-
-.PHONY: all tests objs shlibs runtests clean install
-
-all:
-	@echo "No application yet. Build object files with \"make $(ODIR)/<objectname>.o\""
 
 # Compile all tests.
 tests: $(TESTS) $(SHLIB)
