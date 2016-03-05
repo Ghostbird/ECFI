@@ -29,6 +29,24 @@ make runtests
 ```
 The last lines stop the checker that's left running and remove the shared object that's left. See Known Issues.
 
+A schematic view of the process.
+```
+cfi-checker ← {"echo", "this is a", "test"}
+ │
+ ⎬─ rb_create() ╌╌╌╌╌╌╌╌╌╌╌╌ shared memory ring buffer.
+ │                                 ↓             ↑
+ ├─ fork() ─ checker ─ rb_read()╌╌╌╯             ╎
+ │                     ↑  │                      ╎
+ │                     │  ⎬── cfi_print()        ├ writes
+ │                     ╰──╯                      ╎
+ │                                               ╎
+ │                                               ╎
+ ├─ fork() ─ execvp("echo", {"echo", "this is a", "test"})
+ │
+exit()
+```
+
+
 ## Optimisation points:
 - Use thread instead of separate process for the checker
 - Assume library calls are well-behaved and remove certain checks in ringbuffer.c:rb\_read()
