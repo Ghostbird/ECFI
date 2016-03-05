@@ -11,15 +11,21 @@ A (non-exhaustive) list of software necessary to build the project
 - valgrind (optional, memory usage analysis)
 
 ## Building
+```bash
 make
+```
 
 ## Testing
 To compile and test the ringbuffer library:
- make runtests
+```bash
+make runtests
+```
 
 ## Running
- LD_PRELOAD=bin/lib bin/cfi-checker echo test
- rm /dev/shm/rt_cfi_echo
+```bash
+    LD_PRELOAD=bin/lib bin/cfi-checker echo test
+    rm /dev/shm/rt_cfi_echo
+```
 This last line removes the shared object that persist after the checker is finished.
 See Known Issues.
 
