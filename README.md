@@ -23,7 +23,7 @@ make runtests
 
 ## Running
 ```bash
-    LD_PRELOAD=bin/lib bin/cfi-checker echo test
+    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker echo "this is a" test
     rm /dev/shm/rt_cfi_echo
 ```
 This last line removes the shared object that persist after the checker is finished.
