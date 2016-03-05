@@ -6,15 +6,18 @@
 #include <unistd.h>      /* ftruncate() and close() */
 #include <errno.h>       /* errno */
 #include <stdio.h>       /* fprintf() and stderr */
+#include <stdlib.h>      /* malloc() and free() */
 #include <string.h>      /* memcpy() */
 #include <inttypes.h>    /* Platform independent printf format specifier macros */
 
-ringbuffer_t *rb_create(uint32_t bufsize, const char *bufname)
+ringbuffer_info_t *rb_create(uint32_t bufsize, const char *bufname)
 {
     /* Bail out in case of idiotic request */
     if (bufsize == 0) return NULL;
 
     ringbuffer_t *rb = NULL;
+    ringbuffer_info_t *rb_info = NULL;
+
     /* Open shared memory object. */
     int shmfd = shm_open(bufname, (O_RDWR | O_CREAT | O_EXCL), (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
     if (shmfd == -1)
@@ -60,46 +63,108 @@ ringbuffer_t *rb_create(uint32_t bufsize, const char *bufname)
             rb->start = (regval_t *)(rb + sizeof(ringbuffer_t));
             rb->read = 0;
             rb->write = 0;
+            rb_info = malloc(sizeof(ringbuffer_info_t));
+            /* Write data only if rb_info allocation succeeded.
+            Cleanup in case of error is done later. */
+            if (rb_info != NULL)
+            {
+                /* Calculate size of bufname including terminating null character. */
+                size_t namesize = strlen(bufname) + 1;
+                rb_info->name = malloc(namesize);
+                /* Check whether memory allocation for buffer name succeeded.*/
+                if (rb_info->name != NULL)
+                {
+                    /* Do strncpy, discard result. */
+                    strncpy(rb_info->name, bufname, namesize);
+                    /* Verify copied string. */
+                    if (strncmp(rb_info->name, bufname, namesize) == 0)
+                    {
+                        rb_info->rb = rb;
+                        rb_info->fd = shmfd;
+                    }
+                    else
+                    {
+                        /* Failed to copy string. Try to clean up. */
+                        free(rb_info->name);
+                        /* Setting rb_info->name to NULL will signal cleanup further down in the function. */
+                        rb_info->name = NULL;
+                    }
+                }
+            }
         }
     }
-
-    /* Unlink shared memory object if something failed (rb == NULL). */
-    if (rb == NULL && shm_unlink(bufname) == -1)
+    if (rb_info != NULL && rb_info->name == NULL)
     {
-        fprintf(stderr, "rb_create(): Failed to unlink shared memory object when trying to gracefully handle error.\n");
-        /* Print error messages based on errno. */
-        shm_error_msg(errno);
-        fprintf(stderr, "Program state may now be ill-defined.");
+        /* Something went wrong. Try to clean up */
+        free(rb_info);
+        /* Setting rb_info = NULL to trigger further cleanup. */
+        rb_info = NULL;
     }
-
-    /* Always close fd, since we con't need it after mmap. See man shm_open(3). */
-    if (close(shmfd) == -1)
+    if (rb != NULL && rb_info == NULL)
     {
-        fprintf(stderr,"rb_create(): Failed to close file descriptor to shared memory object");
-        /* Print error message based on errno. */
-        close_error_msg(errno);
-        fprintf(stderr,"Program state may now be ill-defined./n");
+        /* Something went wrong. Try to clean up. */
+        if (munmap(rb, RB_MEMSIZE(bufsize)) == -1)
+        {
+            fprintf(stderr, "rb_create(): Failed to unmap memory when trying to gracefully handle error.\n");
+            /* Print error messages based on errno. */
+            mmap_error_msg(errno);
+            fprintf(stderr, "Program state may now be ill-defined.");
+        }
+        /* Set rb NULL to trigger further clean-up. */
+        rb = NULL;
     }
-    /* Return the pointer to the ringbuffer struct. */
-    return rb;
+    if (rb == NULL)
+    {
+        /* Something went wrong. Try to clean up. */
+        /* Close shared memory object file descriptor. */
+        if (close(shmfd) == -1)
+        {
+            fprintf(stderr, "rb_create(): Failed to close file descriptor when trying to gracefully handle error.\n");
+            /* Print error messages based on errno. */
+            close_error_msg(errno);
+            fprintf(stderr, "Program state may now be ill-defined.");
+        }
+        /* Unlink shared memory. This should trigger file deletion, since we already closed it. */
+        if (shm_unlink(bufname) == -1)
+        {
+            fprintf(stderr, "rb_create(): Failed to unlink shared memory object when trying to gracefully handle error.\n");
+            /* Print error messages based on errno. */
+            shm_error_msg(errno);
+            fprintf(stderr, "Program state may now be ill-defined.");
+        }
+    }
+    /* Return the pointer to the ringbuffer_info struct. */
+    return rb_info;
 }
 
-void rb_destroy(ringbuffer_t *rbptr, const char *bufname)
+void rb_destroy(ringbuffer_info_t *rb_info)
 {
+    /* Close file descriptor to ringbuffer object. */
+    if (close(rb_info->fd) == -1)
+    {
+        fprintf(stderr, "rb_destroy(): Failed close fd %i.\n", rb_info->fd);
+        /* Print error message based on errno. */
+        close_error_msg(errno);
+    }
+    /* Unlink from shared memory object. */
+    if (shm_unlink(rb_info->name) == -1)
+    {
+        fprintf(stderr, "rb_destroy(): Failed to unlink shared memory object. Next attempt to shm_open(%s) may fail!\n", rb_info->name);
+        /* Print error message based on errno. */
+        shm_error_msg(errno);
+    }
     /* Unmap the memory allocated to the buffer. */
-    if (munmap(rbptr, rbptr->size + sizeof(ringbuffer_t)) == -1)
+    if (munmap(rb_info->rb, RB_MEMSIZE(rb_info->rb->size)) == -1)
     {
         fprintf(stderr, "rb_destroy(): Failed to unmap memory. MEMORY LEAK!\n");
         /* Print error message based on errno. */
         mmap_error_msg(errno);
     }
     /* Unlink shared memory object. */
-    if (shm_unlink(bufname) == -1)
-    {
-        fprintf(stderr, "rb_destroy(): Failed to unlink shared memory object. Next attempt to shm_open(%s) will fail!\n", bufname);
-        /* Print error message based on errno. */
-        shm_error_msg(errno);
-    }
+    /* Free memory allocated for the buffer name. */
+    free(rb_info->name);
+    /* Free memory allocated buffer information itself. */
+    free(rb_info);
 }
 
 regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)

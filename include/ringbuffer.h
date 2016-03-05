@@ -5,7 +5,7 @@
 
 /* Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
 Take care that size is not allowed to be so big that it overflows the uint32_t maximum. */
-#define RB_MEMSIZE(size) ((sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT)))
+#define RB_MEMSIZE(size) ((uint32_t)((sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT))))
 
 /*! Modulus calculation for positive divisors.
     - \a a The dividend
@@ -40,18 +40,39 @@ struct ringbuffer
 /*! The ringbuffer_t typedef */
 typedef struct ringbuffer ringbuffer_t;
 
+/*! This is a ring buffer information structure.
+
+    It is created by the rb_create function and should be passed to the rb_destroy() function.
+    These functions will take care of the memory management.
+*/
+struct ringbuffer_info
+{
+    /*! Pointer to the location of the ringbuffer in memory. */
+    ringbuffer_t *rb;
+    /*! Filedescriptor to the open (anonymous) file associated with the ringbuffer. */
+    int fd;
+    /*! Name of the file associated with the ringbuffer. */
+    char* name;
+};
+
+/*! The ringbuffer_info_t typedef */
+typedef struct ringbuffer_info ringbuffer_info_t;
+
 /*! Create a new ringbuffer
     \param  bufsize  The size of the ring buffer in bytes.
     \param  bufname  Name of the ring buffer. Must conform to shm_open(3).
-    \return          A pointer to a ringbuffer. NULL on failure.
+    \return          A pointer to a ringbuffer_info struct. NULL on failure.
 */
-ringbuffer_t *rb_create(uint32_t bufsize, const char *bufname);
+ringbuffer_info_t *rb_create(uint32_t bufsize, const char *bufname);
 
-/*! Destroy a ringbuffer nicely
-    \param  rbptr    A pointer to a valid fully initialised ring buffer.
-    \param  bufname  The name of the shared memory object that is mapped at rbptr. Must conform to shm_open(3).
+/*! Destroy a ringbuffer nicely.
+
+    This function structurally calls complementary functions to those in
+    rb_create to clean up a ringbuffer.
+    Similar to free() the pointer passed to this function should not be used afterwards.
+    \param  rb_info  A pointer to a valid ring buffer information struct.
 */
-void rb_destroy(ringbuffer_t *rbptr, const char *bufname);
+void rb_destroy(ringbuffer_info_t *rb_info);
 
 /*! Read \a count register values from \a rbptr into \a data.
     The read will fail if it would overtake the write pointer.
