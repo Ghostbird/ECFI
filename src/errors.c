@@ -1,4 +1,4 @@
-#include <errno.h>       /* errno */
+#include <errno.h>       /* Error number macros */
 #include <stdio.h>       /* fprintf() and stderr */
 
 void shm_error_msg(int errornum)
@@ -29,7 +29,7 @@ void shm_error_msg(int errornum)
         fprintf(stderr,"Attempted to unlink nonexistent shared memory object.\n");
         break;
     default:
-        fprintf(stderr,"An unknown error has occurred with errno: %d.\n", errornum);
+        fprintf(stderr,"An unknown error has occurred during shm_open() or shm_unlink() with errno: %i.\n", errornum);
     }
 }
 
@@ -68,7 +68,7 @@ void mmap_error_msg(int errornum)
         fprintf(stderr,"The lenght + offset would overflow the unsigned long.\n");
         break;
     default:
-        fprintf(stderr,"An unknown error has occurred with errno: %d.\n", errornum);
+        fprintf(stderr,"An unknown error has occurred during mmap() with errno: %i.\n", errornum);
     }
 }
 
@@ -100,7 +100,7 @@ void ftrunc_error_msg(int errornum)
         fprintf(stderr,"The underlying filesystem does not support extending a file beyond its current size, or the operation was prevented by a file seal.\n");
         break;
     default:
-        fprintf(stderr,"An unknown error has occurred with errno: %d.\n", errornum);
+        fprintf(stderr,"An unknown error has occurred during ftruncate() with errno: %i.\n", errornum);
     }
 }
 
@@ -118,6 +118,22 @@ void close_error_msg(int errornum)
         fprintf(stderr,"An I/O error occurred.\n");
         break;
     default:
-        fprintf(stderr,"An unknown error has occurred with errno: %d.\n", errornum);
+        fprintf(stderr,"An unknown error has occurred with errno: %i.\n", errornum);
+    }
+}
+
+void fork_error_msg(int errornum)
+{
+    switch (errornum)
+    {
+    case EAGAIN:
+        fprintf(stderr,"Either a kernel imposed limit on the number of threads has been reached or the caller is operating under the SCHED_DEADLINE scheduling policy and does not have the reset-on-fork flag set.  See sched(7).\n");
+        break;
+    case ENOMEM:
+        fprintf(stderr,"fork() failed to allocate the necessary kernel structures because memory is tight.");
+    case ENOSYS:
+        fprintf(stderr,"fork() is not supported on this platform.");
+    default:
+        fprintf(stderr,"An unknown error occurred during fork() with errno: %i.\n", errornum);
     }
 }
