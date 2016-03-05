@@ -186,6 +186,13 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
         {
             data[i] = rbptr->start[(uint32_t)((upcast_read + i) % rbptr->size)];
         }
+        /* Since reads are not atomic, and writes always go through, check whether no overwrite happened. */
+        if (rbptr->read != (uint32_t)upcast_read)
+        {
+            /* Overwrite happened. */
+            fprintf(stderr, "Buffer overwrite detected.");
+            return NULL;
+        }
         /* Update read index. */
         rbptr->read = (uint32_t)((upcast_read + count) % rbptr->size);
     }

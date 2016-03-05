@@ -80,7 +80,7 @@ void rb_destroy(ringbuffer_info_t *rb_info);
     The caller is responsible for memory management of the data pointer.
     \param  rbptr  A pointer to the ring buffer struct to read from.
     \param  data   A pointer to the location where the data should be copied.
-    \param  count  Non-zero number of register values to read from the buffer.
+    \param  count  Non-zero number of regval_t values to read from the buffer.
     \return        The \a data pointer. Useful in e.g. if (rb_read(..) != NULL)
 */
 regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);

@@ -1,16 +1,33 @@
-#include "ringbuffer.h" /* The ring buffer */
-#include <stdio.h>      /* printf(), fprintf(), sprintf() */
-#include <fcntl.h>      /* fcntl() */
-#include <stdlib.h>     /* stderr, exit() and macros */
-#include <errno.h>      /* errno variable for error handling. */
-#include <string.h>     /* strlen() */
-#include <signal.h>     /* kill() */
-#include <sys/wait.h>   /* waitpid() */
-#include <sys/types.h>  /* signal macros */
-#include <unistd.h>     /* fork() */
-#include "errors.h"     /* translate and print errno as human readable error message. */
+#include "ringbuffer.h"     /* The ring buffer */
+#include <stdio.h>          /* printf(), fprintf(), sprintf() */
+#include <fcntl.h>          /* fcntl() */
+#include <stdlib.h>         /* stderr, exit() and macros */
+#include <errno.h>          /* errno variable for error handling. */
+#include <string.h>         /* strlen() */
+#include <signal.h>         /* kill() */
+#include <sys/wait.h>       /* waitpid() */
+#include <sys/types.h>      /* signal macros */
+#include <unistd.h>         /* fork() */
+#include <sched.h>          /* sched_yield() */
+#include "errors.h"         /* translate and print errno as human readable error message. */
+#include "cfi-heuristics.h" /* cfi-checker heuristics. */
 
 #define RB_PREFIX "rb_cfi_"
+
+void checker(ringbuffer_info_t *rb_info)
+{
+    regval_t data[WRITE_DATACOUNT];
+    /* Infinite loop */
+    while(1)
+    {
+        /* Read all available data. */
+        while (rb_read(rb_info->rb, data, WRITE_DATACOUNT) != NULL)
+        {
+            cfi_print(data);
+        }
+    sched_yield();
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -59,13 +76,13 @@ int main(int argc, char *argv[])
     }
     else if (checker_pid == 0)
     {
-        /* RUN THE CHECKER HERE */
-        printf("Just pretend I'm doing something for now!\n");
+        printf("Checker is starting.\n");
         fflush(NULL);
-        sleep(3);
-        fprintf(stderr,"I'm done.\n");
-        rb_destroy(rb_info);
-        exit(EXIT_SUCCESS);
+        /* Start the checker. */
+        checker(rb_info);
+        /* Unreachable code. Checker does not return, it is terminated. */
+        fprintf(stderr, "This is impossible, checker() should not return.");
+        exit(EXIT_FAILURE);
     }
     /* Flush to all standard file descriptors to prevent double output due to fork() */
     fflush(NULL);

@@ -24,10 +24,10 @@ make runtests
 ## Running
 ```bash
     LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker echo "this is a" test
+    pkill bin/cfi-checker
     rm /dev/shm/rt_cfi_echo
 ```
-This last line removes the shared object that persist after the checker is finished.
-See Known Issues.
+The last lines stop the checker that's left running and remove the shared object that's left. See Known Issues.
 
 ## Optimisation points:
 - Use thread instead of separate process for the checker
@@ -35,5 +35,8 @@ See Known Issues.
 
 ## Known issues:
 - rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
-- checker process needs a SIGTERM handler that nicely destroys ring buffer in case it is kill()-ed.
+- The checker never exits, it must be killed.
+- The checker process needs a SIGTERM handler that nicely destroys ring buffer in case it is killed.
+    But how to provide the handler with the ringbuffer info?
 - execve causes shm_unlink() and munmap() like behaviour, and this must be accounted for.
+- check correct memory usage of structs (maybe use offsetof)

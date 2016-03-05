@@ -26,11 +26,11 @@ _TESTS=ringbuffer
 TESTS=$(patsubst %,$(TBDIR)/%,$(_TESTS))
 
 # Define the dependencies.
-_DEPS=ringbuffer.h errors.h
+_DEPS=ringbuffer.h errors.h cfi-heuristics.h
 DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Define the object files to compile.
-_OBJ=errors
+_OBJ=errors cfi-heuristics
 OBJ=$(patsubst %,$(ODIR)/%.o,$(_OBJ))
 
 # Define the shared object libraries to compile.
