@@ -11,11 +11,17 @@ A (non-exhaustive) list of software necessary to build the project
 - valgrind (optional, memory usage analysis)
 
 ## Building
-At the moment there's no main application yet.
+make
 
 ## Testing
-To compile and test all current functionality, run:
+To compile and test the ringbuffer library:
  make runtests
+
+## Running
+ LD_PRELOAD=bin/lib bin/cfi-checker echo test
+ rm /dev/shm/rt_cfi_echo
+This last line removes the shared object that persist after the checker is finished.
+See Known Issues.
 
 ## Optimisation points:
 - Use thread instead of separate process for the checker
@@ -23,4 +29,5 @@ To compile and test all current functionality, run:
 
 ## Known issues:
 - rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
-- Repeatedly creating and destroying ringbuffers in a single process will keep allocating pages to the process and may run into the system limit.
+- checker process needs a SIGTERM handler that nicely destroys ring buffer in case it is kill()-ed.
+- execve causes shm_unlink() and munmap() like behaviour, and this must be accounted for.
