@@ -25,10 +25,6 @@ typedef uint32_t regval_t;
 */
 struct ringbuffer
 {
-    /*! The memory location where the ring buffer starts.
-    This implies that the buffer ends before memory location:
-      start + size * sizeof(regval_t) */
-    regval_t *start;
     /*! The number of regval_t objects that fit in the buffer. */
     uint32_t size;
     /*! The current read index */
@@ -92,5 +88,12 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);
     If this operation overwrites the read pointer it will increment the read pointer by WRITE_DATACOUNT.
     \param  data an array of data to write.
     \param  rbptr  A pointer to the ring buffer to write to. CANNOT BE NULL.
+    \return The pointer to the data array, NULL if the read failed.
 */
 void rb_write(const regval_t data[8], ringbuffer_t *rbptr);
+
+/*! Attach to an existing ringbuffer from a file descriptor.
+    \param  fd The file descriptor of the open shared memory file.
+    \return    A pointer to the ringbuffer_t object stored in the file.
+*/
+ringbuffer_t *rb_attach(int fd);

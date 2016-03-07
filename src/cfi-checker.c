@@ -4,6 +4,7 @@
 #include <stdlib.h>         /* stderr, exit() and macros */
 #include <errno.h>          /* errno variable for error handling. */
 #include <string.h>         /* strlen() */
+#include <strings.h>        /* index(), rindes() */
 #include <signal.h>         /* kill() */
 #include <sys/wait.h>       /* waitpid() */
 #include <sys/types.h>      /* signal macros */
@@ -44,16 +45,26 @@ int main(int argc, char *argv[])
         fprintf(stderr, "USAGE: %s <program to run + arguments>\n",argv[0]);
         exit(EXIT_FAILURE);
     }
-    /* Allocate space to make a nice name for the ringbuffer.
-    Not sure this is the correct way to calculate this though.*/
-    size_t namesize = strlen("cfi-buffer") + strlen(argv[1]) + 1;
+    /* Allocate space to make a nice name for the ringbuffer.*/
+    char* basename;
+    if (index(argv[1], '/') == NULL)
+    {
+        /* No forwardslashes in the name. Use full name. */
+        basename = argv[1];
+    }
+    else
+    {
+        /* Start after the last forwardslash. */
+        basename = rindex(argv[1], '/') + 1;
+    }
+    size_t namesize = strlen("cfi-buffer") + strlen(basename) + 1;
     char *name = malloc(namesize);
     if (name == NULL)
     {
         fprintf(stderr, "Failed to allocate memory. Aborting...\n");
         exit(EXIT_FAILURE);
     }
-    if (snprintf(name, namesize, "%s%s", RB_PREFIX, argv[1]) >= (int)namesize)
+    if (snprintf(name, namesize, "%s%s", RB_PREFIX, basename) >= (int)namesize)
     {
         fprintf(stderr, "Name was truncated but this should not happen. Aborting...\n");
         exit(EXIT_FAILURE);

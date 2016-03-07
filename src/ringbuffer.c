@@ -59,8 +59,6 @@ ringbuffer_info_t *rb_create(uint32_t bufsize, const char *bufname)
         {
             /* Fill the struct with data */
             rb->size = bufsize;
-            /* Calculate the start position of the buffer to lie directly after the “administrative” ringbuffer struct in memory. */
-            rb->start = (regval_t *)(rb + sizeof(ringbuffer_t));
             rb->read = 0;
             rb->write = 0;
             rb_info = malloc(sizeof(ringbuffer_info_t));
@@ -184,7 +182,9 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
         Can most likely be optimised. */
         for (uint32_t i = 0; i < count; i++)
         {
-            data[i] = rbptr->start[(uint32_t)((upcast_read + i) % rbptr->size)];
+            /* (rbptr + 1) is a pointer to the memory directly behind that used by the struct rbptr.
+               That is where the real buffer begins. */
+            data[i] = ((regval_t*)(rbptr + 1))[(uint32_t)((upcast_read + i) % rbptr->size)];
         }
         /* Since reads are not atomic, and writes always go through, check whether no overwrite happened. */
         if (rbptr->read != (uint32_t)upcast_read)
@@ -205,8 +205,9 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
 
 void rb_write(const regval_t data[8], ringbuffer_t *rbptr)
 {
-    /* Copy arguments to ringbuffer.*/
-    memcpy((void*) &(rbptr->start[rbptr->write]), (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
+    /* (rbptr + 1) is a pointer to the memory directly behind that used by the struct rbptr.
+       That is where the real buffer begins. */
+    memcpy((void*) (((regval_t*)(rbptr + 1)) + rbptr->write), (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
     /* Update write index. */
     rbptr->write += WRITE_DATACOUNT;
     /* Fix write index if it's beyond the size of the buffer. */
@@ -219,3 +220,28 @@ void rb_write(const regval_t data[8], ringbuffer_t *rbptr)
     return;
 }
 
+ringbuffer_t *rb_attach(int fd)
+{
+    /* mmap the shared memory file descriptor.
+       Since the size of the buffer is unknown, map only the ringbuffer_t struct.*/
+    ringbuffer_t *rb = (ringbuffer_t *)mmap(NULL, sizeof(rb), (PROT_READ | PROT_WRITE), MAP_SHARED, fd, 0);
+    /* Check whether memory allocation succeeded. */
+    if (rb == (ringbuffer_t *) -1)
+    {
+        fprintf(stderr,"rb_attach(): Failed to map memory of shared object. ");
+        /* Print error message based on errno. */
+        mmap_error_msg(errno);
+        return NULL;
+    }
+    /* Remap ring buffer now that the size can be read. */
+    rb = (ringbuffer_t *)mmap(rb, RB_MEMSIZE(rb->size), (PROT_READ | PROT_WRITE), MAP_SHARED, fd, 0);
+    /* Check whether memory allocation succeeded. */
+    if (rb == (ringbuffer_t *) -1)
+    {
+        fprintf(stderr,"rb_attach(): Failed to remap shared object. ");
+        /* Print error message based on errno. */
+        mmap_error_msg(errno);
+        return NULL;
+    }
+    return rb;
+}

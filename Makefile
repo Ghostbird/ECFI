@@ -48,9 +48,9 @@ $(SHLIBDIR)/lib%.so: $(ODIR)/%.o
 	$(CC) $(SHFLAGS) -o $@ $^
 
 # Compile a test from a test source file.
-$(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIBDIR)/lib%.so
+$(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(TBDIR)
-	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) -l$(notdir $@)
+	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)

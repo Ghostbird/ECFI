@@ -54,11 +54,6 @@ char test_create(uint32_t bufsize)
                 fprintf(stderr, "Ring buffer allocation of %d items created buffer with size %d instead.\n", bufsize, rb->size);
                 success = FALSE;
             }
-            if (rb->start == NULL)
-            {
-                fprintf(stderr, "Ring buffer failed to allocate memory space for %d items.\n", bufsize);
-                success = FALSE;
-            }
             if (rb->read != 0)
             {
                 fprintf(stderr,"Ring buffer initial read index set to %d instead of 0.\n", rb->write);
@@ -215,7 +210,7 @@ char test_read()
     /* Fill the buffer manually with test values */
     for (uint32_t i = 0; i < rb->size; i++)
     {
-        rb->start[i] = (regval_t)i;
+        ((regval_t*)(rb + 1))[i] = (regval_t)i;
     }
     if (rb_read(NULL,NULL,0) != NULL)
     {
