@@ -24,10 +24,10 @@ make runtests
 ## Running
 ```bash
     LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker echo "this is a" test
-    pkill bin/cfi-checker
+    kill `pgrep bin/cfi-checker`
     rm /dev/shm/rt_cfi_echo
 ```
-The last lines stop the checker that's left running and remove the shared object that's left. See Known Issues.
+The last lines stop the checker processes that are left running and remove the shared object that's left. See Known Issues.
 
 A schematic view of the process.
 ```

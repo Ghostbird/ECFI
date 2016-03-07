@@ -66,7 +66,7 @@ doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
 	doxygen
 
 # Compile all tests.
-tests: $(TESTS) $(SHLIB)
+tests: $(TESTS) $(SHLIB) bin/injection-test
 
 # Compile all object files.
 objs: $(OBJ)

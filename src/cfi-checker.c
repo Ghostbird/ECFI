@@ -89,6 +89,10 @@ int main(int argc, char *argv[])
     {
         printf("Checker is starting.\n");
         fflush(NULL);
+        /* We'll lose connection to the shell when the parent process exits.
+           Redirect stdout and stderr to logs. */
+        freopen("checker.out","w",stdout);
+        freopen("checker.err","w",stderr);
         /* Start the checker. */
         checker(rb_info);
         /* Unreachable code. Checker does not return, it is terminated. */
@@ -113,6 +117,11 @@ int main(int argc, char *argv[])
         {
             printf("Running %s\n", argv[1]);
             fflush(NULL);
+            /* We'll lose connection to the shell when the parent process exits.
+            Redirect stdout and stderr to logs. */
+            freopen("writer.out","w",stdout);
+            freopen("writer.err","w",stderr);
+
             /* Execute program supplied in arguments. */
             execvp(argv[1], &argv[1]);
             fprintf(stderr, "This is impossible. execv() should have replaced the execution context.\n");
