@@ -32,8 +32,11 @@ To compile and test the CFI executable:
 
 ## Architecture ##
 Memory layout for ring buffer:
+
 ![Please read include/ringbuffer.h if you cannot see this picture.](doc/diagrams/ringbuffer_memory.png "The memory layout of a ringbuffer in use.")
+
 Activity diagram of the CFI-Checker.
+
 ![Please read src/cfi-checker.c if you cannot see this picture.](doc/diagrams/cfi-checker_activity.png "Activity diagram that shows how the processes interact.")
 
 ## Optimisation points:
