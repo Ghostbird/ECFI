@@ -20,32 +20,21 @@ To compile and test the ringbuffer library:
 ```bash
 make runtests
 ```
+To compile and test the CFI executable:
+```bash
+    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/cfi-test
+```
 
 ## Running
 ```bash
-    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker echo "this is a" test
-    kill `pgrep bin/cfi-checker`
-    rm /dev/shm/rt_cfi_echo
-```
-The last lines stop the checker processes that are left running and remove the shared object that's left. See Known Issues.
-
-A schematic view of the process.
-```
-cfi-checker ← {"echo", "this is a", "test"}
- │
- ⎬─ rb_create() ╌╌╌╌╌╌╌╌╌╌╌╌ shared memory ring buffer.
- │                                 ↓             ↑
- ├─ fork() ─ checker ─ rb_read()╌╌╌╯             ╎
- │                     ↑  │                      ╎
- │                     │  ⎬── cfi_print()        ├ writes
- │                     ╰──╯                      ╎
- │                                               ╎
- │                                               ╎
- ├─ fork() ─ execvp("echo", {"echo", "this is a", "test"})
- │
-exit()
+    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker <path to executable>
 ```
 
+## Architecture ##
+Memory layout for ring buffer:
+![Please read include/ringbuffer.h if you cannot see this picture.](doc/diagrams/ringbuffer_memory.svg "The memory layout of a ringbuffer in use.")
+Activity diagram of the CFI-Checker.
+![Please read src/cfi-checker.c if you cannot see this picture.](doc/diagrams/cfi-checker_activity.svg "Activity diagram that shows how the processes interact.")
 
 ## Optimisation points:
 - Use thread instead of separate process for the checker
@@ -53,8 +42,5 @@ exit()
 
 ## Known issues:
 - rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
-- The checker never exits, it must be killed.
-- The checker process needs a SIGTERM handler that nicely destroys ring buffer in case it is killed.
-    But how to provide the handler with the ringbuffer info?
-- execve causes shm_unlink() and munmap() like behaviour, and this must be accounted for.
-- check correct memory usage of structs (maybe use offsetof)
+- Check correct memory usage of structs (maybe use offsetof)
+- If the checker is aborted it may be necessary to manually delete the ringbuffer: ```rm /dev/shm/rb_cfi_*```
