@@ -17,7 +17,7 @@
 
 void checker(ringbuffer_info_t *rb_info)
 {
-    regval_t data[WRITE_DATACOUNT];
+    regval_t data[WRITE_DATACOUNT] = {0};
     /* Infinite loop */
     while(1)
     {
@@ -33,7 +33,7 @@ void checker(ringbuffer_info_t *rb_info)
 int main(int argc, char *argv[])
 {
     /* It's nice for debugging to echo the input. Remove later. */
-    printf("Checker ran with arguments:\n");
+    printf("Got arguments:\n");
     for (int i = 0; i < argc; i++)
     {
         printf(" %i: %s\n", i, argv[i]);
@@ -61,21 +61,22 @@ int main(int argc, char *argv[])
     char *name = malloc(namesize);
     if (name == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory. Aborting...\n");
+        fprintf(stderr, "Failed to allocate memory. Abort.\n");
         exit(EXIT_FAILURE);
     }
     if (snprintf(name, namesize, "%s%s", RB_PREFIX, basename) >= (int)namesize)
     {
-        fprintf(stderr, "Name was truncated but this should not happen. Aborting...\n");
+        fprintf(stderr, "Name was truncated but this should not happen. Abort.\n");
         exit(EXIT_FAILURE);
     }
     /* Add terminating null character to name. */
     name[namesize-1] = '\0';
-    /* Create the ring buffer for the checker. */
+    /* Create the ring buffer for the checker.
+       Don't forget, to rb_destroy() it before exit().*/
     ringbuffer_info_t *rb_info = rb_create(256, name);
     if (rb_info == NULL)
     {
-        fprintf(stderr, "Could not create ringbuffer. Aborting...\n");
+        fprintf(stderr, "Could not create ringbuffer. Abort.\n");
         exit(EXIT_FAILURE);
     }
     /* Flush to all standard file descriptors to prevent double output due to fork() */
@@ -84,10 +85,12 @@ int main(int argc, char *argv[])
     if (checker_pid == -1)
     {
         fprintf(stderr, "Failed to spawn child process for checker. Aborting...\n");
+        rb_destroy(rb_info);
+        exit(EXIT_FAILURE);
     }
     else if (checker_pid == 0)
     {
-        printf("Checker is starting.\n");
+        printf("Checker: Starting...\n");
         fflush(NULL);
         /* We'll lose connection to the shell when the parent process exits.
            Redirect stdout and stderr to logs. */
@@ -96,7 +99,7 @@ int main(int argc, char *argv[])
         /* Start the checker. */
         checker(rb_info);
         /* Unreachable code. Checker does not return, it is terminated. */
-        fprintf(stderr, "This is impossible, checker() should not return.");
+        fprintf(stderr, "Checker: Impossible, checker() should not return. Abort.");
         exit(EXIT_FAILURE);
     }
     /* Flush to all standard file descriptors to prevent double output due to fork() */
@@ -107,39 +110,45 @@ int main(int argc, char *argv[])
         fork_error_msg(errno);
         fprintf(stderr, "Failed to spawn child process for program. Aborting...\n");
     }
-    else if (program_pid == 0) /* Child process. */
+    else if (program_pid == 0) /* Forked child */
     {
+        /* Remove close-on-exec flag on shared memory file descriptor. */
         if (fcntl(rb_info->fd, F_SETFD, fcntl(rb_info->fd, F_GETFD) & ~FD_CLOEXEC) == -1)
         {
-            fprintf(stderr, "Failed to remove FD_CLOEXEC flag on fd %i. Aborting...\n", rb_info->fd);
+            fprintf(stderr, "Program: Failed to remove FD_CLOEXEC flag on fd %i. Aborting...\n", rb_info->fd);
         }
         else
         {
-            printf("Running %s\n", argv[1]);
-            fflush(NULL);
-            /* We'll lose connection to the shell when the parent process exits.
-            Redirect stdout and stderr to logs. */
-            freopen("writer.out","w",stdout);
-            freopen("writer.err","w",stderr);
-
-            /* Execute program supplied in arguments. */
+            printf("Program: Running %s\n", argv[1]);
+            fflush(stdout);
             execvp(argv[1], &argv[1]);
-            fprintf(stderr, "This is impossible. execv() should have replaced the execution context.\n");
+            fprintf(stderr, "Program: execv() has failed.\n");
         }
+        /* Exit forked process on failure. */
+        exit(EXIT_FAILURE);
     }
-    else
+    else /* Parent process of successful fork() */
     {
-        /* Here the parent process exits and the children are attached to the system process. */
-        printf("Parent process exits now.\n");
-        exit(EXIT_SUCCESS);
+        printf("Waiting for program to run and finish.\n");
+        fflush(stdout);
+        /* Wait for program to finish. */
+        waitid(P_PID, program_pid, NULL, WEXITED);
+        printf("Program finished.\n");
+        fflush(stdout);
+        /* Give checker some time to finish last reads.
+           TODO: Implement better signalling. */
+        sleep(3);
     }
-    fprintf(stderr, "Something has gone wrong. Killing child.\n");
-    /* If we're here, something went wrong. Stop the checker. */
+    printf("Closing checker.\n");
+    fflush(stdout);
+    /* Shut down checker. */
     int killret = kill(checker_pid, SIGTERM);
     switch (killret)
     {
         case 0:
         /* Wait for the checker to stop. */
+        printf("Waiting for checker to exit.\n");
+        fflush(stdout);
         waitpid(program_pid, NULL, 0);
         break;
         case ESRCH:
@@ -148,9 +157,14 @@ int main(int argc, char *argv[])
         case EINVAL:
         case EPERM:
         default:
-        fprintf(stderr, "Failed to kill checker process during abort. You may have to kill it manually.\n");
+        fprintf(stderr, "Failed to kill checker process during exit. You may have to kill it manually.\n");
+        /* Clean up ringbuffer. */
+        rb_destroy(rb_info);
+        exit(EXIT_FAILURE);
     }
-    exit(EXIT_FAILURE);
-    /* Unreachable, will compiler detect it? */
-    return 0;
+    printf("Checker has exited. Cleaning up ringbuffer.\n");
+    rb_destroy(rb_info);
+    printf("Finished, exiting.\n");
+    fflush(NULL);
+    return EXIT_SUCCESS;
 }

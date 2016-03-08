@@ -15,7 +15,7 @@ TBDIR=$(BDIR)/$(TDIR)
 # Compiler choice.
 CC=gcc
 #Compilation flags, includes, libraries, standard and error/warnings.
-CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -std=c99 -pedantic-errors -Wall -Wextra -Werror
+CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -std=c99 -pedantic-errors -Wall -Wextra -Werror $(DEBUG)
 # Compilation options to compile an object file (*.o) to a shared object library (*.so)
 SHFLAGS=-shared -Wl,-soname,$(basename $@)
 # Non-default system libraries to link.
@@ -58,7 +58,7 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 
 .PHONY: all tests objs shlibs runtests clean install
 
-all: bin/cfi-checker
+all: bin/cfi-checker tests
 
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
