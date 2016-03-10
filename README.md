@@ -22,7 +22,7 @@ make runtests
 ```
 To compile and test the CFI executable:
 ```bash
-    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/cfi-test
+    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test
 ```
 
 ## Running
