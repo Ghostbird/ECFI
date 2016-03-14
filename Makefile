@@ -56,7 +56,7 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-.PHONY: all tests objs shlibs runtests clean install
+.PHONY: all tests objs shlibs runtests clean install doc
 
 all: bin/cfi-checker tests
 
