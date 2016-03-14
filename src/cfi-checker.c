@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     name[namesize-1] = '\0';
     /* Create the ring buffer for the checker.
        Don't forget, to rb_destroy() it before exit().*/
-    ringbuffer_info_t *rb_info = rb_create(256, name);
+    ringbuffer_info_t *rb_info = rb_create(255, name);
     if (rb_info == NULL)
     {
         fprintf(stderr, "Could not create ringbuffer. Abort.\n");
