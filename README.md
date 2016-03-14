@@ -57,3 +57,7 @@ Activity diagram of the CFI-Checker.
 - rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
 - Check correct memory usage of structs (maybe use offsetof)
 - If the checker is aborted it may be necessary to manually delete the ringbuffer: ```rm /dev/shm/rb_cfi_*```
+
+## Real-Time Features:
+- Priority handling using Ringbuffer
+- Implementation without using any Kernel API with generic spinlocks. 
