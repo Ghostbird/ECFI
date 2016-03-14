@@ -145,7 +145,7 @@ void mlock_error_msg(int errornum)
     switch(errornum)
     {
     case ENOMEM:
-        fprintf(stderr,"The caller ran into a memory limit. See mlock(2).\n");
+        fprintf(stderr,"Error ENOMEM can be caused by many different scenario, see the man page for mlock(2).\n");
         break;
     case EPERM:
         fprintf(stderr,"The caller is not privileged, but needs privilege to perform the requested operation.\n");
@@ -155,10 +155,6 @@ void mlock_error_msg(int errornum)
         break;
     case EINVAL:
         fprintf(stderr,"The result of addition addr+len was less than addr, or addr was not a multiple of the page size. See mlock(2).\n");
-        break;
-    case ENOMEM:
-        fprintf(stderr,"Some of the specified address range does not correspond to mapped pages in the address space of the process.\n");
-        fprintf(stderr,"OR: Locking or unlocking a region would result in the total number of mappings with distinct attributes exceeding the allowed maximum.\n");
         break;
     default:
         fprintf(stderr,"An unknown error occurred during mlock() with errno: %i.\n", errornum);
