@@ -84,4 +84,4 @@ valgrind: tests
 # Remove all generated files.
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
-	rm -rf $(DDIR) $(BDIR)
+	rm -rf $(DDIR)/html $(DDIR)/latex $(BDIR)
