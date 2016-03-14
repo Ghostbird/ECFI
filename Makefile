@@ -56,7 +56,7 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-.PHONY: all tests objs shlibs runtests clean install doc
+.PHONY: all tests objs shlibs runtests clean install doc debug
 
 all: bin/cfi-checker tests
 
@@ -73,6 +73,10 @@ objs: $(OBJ)
 
 # Compile all shared object libraries.
 shlibs: $(SHLIB)
+
+debug: DEBUG = -ggdb
+debug: all
+
 
 # Run all tests.
 runtests: tests
