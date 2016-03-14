@@ -1,6 +1,6 @@
 #include "ringbuffer.h"
 #include "errors.h"
-#include <sys/mman.h>    /* shm_open(), shm_unlink() and mmap() */
+#include <sys/mman.h>    /* shm_open(), shm_unlink(), mmap(), protection and flags macros */
 #include <sys/stat.h>    /* Mode constraints for shm_open() */
 #include <fcntl.h>       /* Flag values for O_ constants for shm_open() */
 #include <unistd.h>      /* ftruncate() and close() */
@@ -45,7 +45,7 @@ ringbuffer_info_t *rb_create(uint32_t bufsize, const char *bufname)
         - MAP_ANONYMOUS (not backed to file)
         - MAP_UNINITIALISED (not zeroed before use).
         - MAP_STACK (map on stack) */
-        rb = (ringbuffer_t *)mmap(NULL, RB_MEMSIZE(bufsize), (PROT_READ | PROT_WRITE), MAP_SHARED, shmfd, 0);
+        rb = (ringbuffer_t *)mmap(NULL, RB_MEMSIZE(bufsize), PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, 0);
     	/* Check whether memory allocation succeeded. */
         if (rb == (ringbuffer_t *)-1)
     	{
@@ -57,6 +57,11 @@ ringbuffer_info_t *rb_create(uint32_t bufsize, const char *bufname)
     	}
     	else
         {
+            if (mlock(rb, RB_MEMSIZE(bufsize)) == -1)
+            {
+                fprintf(stderr, "rb_create(): Failed to lock buffer pages into memory. Performance may be suboptimal./n");
+                mlock_error_msg(errno);
+            }
             /* Fill the struct with data */
             rb->size = bufsize;
             rb->read = 0;
@@ -242,6 +247,11 @@ ringbuffer_t *rb_attach(int fd)
         /* Print error message based on errno. */
         mmap_error_msg(errno);
         return NULL;
+    }
+    if (mlock(rb, RB_MEMSIZE(rb->size)) == -1)
+    {
+        fprintf(stderr, "rb_attach(): Failed to lock buffer pages into memory. Performance may be suboptimal./n");
+        mlock_error_msg(errno);
     }
     return rb;
 }
