@@ -22,7 +22,7 @@ SHFLAGS=-shared -Wl,-soname,$(basename $@)
 LIBS=-lrt
 
 # Define the tests
-_TESTS=ringbuffer
+_TESTS=ringbuffer read-speed
 TESTS=$(patsubst %,$(TBDIR)/%,$(_TESTS))
 
 # Define the dependencies.
