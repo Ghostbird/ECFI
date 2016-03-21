@@ -61,3 +61,4 @@ Activity diagram of the CFI-Checker.
 ## Real-Time Features:
 - Priority handling using Ringbuffer
 - Implementation without using any Kernel API with generic spinlocks. 
+- Formally verifiable hard Real-Time in the injected code.
