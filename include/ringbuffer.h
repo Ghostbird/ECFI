@@ -1,11 +1,14 @@
 #include <inttypes.h>
 
-/* Amount of regval_t entries in a buffer field. */
+/*! Amount of regval_t entries in a buffer field. */
 #define WRITE_DATACOUNT 8
 
-/* Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
+/*! Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
 Take care that size is not allowed to be so big that it overflows the uint32_t maximum. */
 #define RB_MEMSIZE(size) ((uint32_t)((sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT))))
+
+/*! This bit indicates that an override has happened. */
+#define RB_FLAG_OVERRIDE 0x01
 
 /*! Modulus calculation for positive divisors.
     - \a a The dividend
@@ -31,6 +34,8 @@ struct ringbuffer
     uint32_t read;
     /*! The current write index */
     uint32_t write;
+    /*! The flags */
+    unsigned char flags;
 };
 
 /*! The ringbuffer_t typedef */
