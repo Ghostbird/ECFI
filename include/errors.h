@@ -21,3 +21,7 @@ void fork_error_msg(int errornum);
 /** This function converts an errno set during mlock() to a human readable error message on stderr. 
 \param errornum The error number from errno. */
 void mlock_error_msg(int errornum);
+
+/** This function converts an errno set during munlock() to a human readable error message on stderr. 
+\param errornum The error number from errno. */
+void munlock_error_msg(int errornum);

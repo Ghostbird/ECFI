@@ -160,3 +160,15 @@ void mlock_error_msg(int errornum)
         fprintf(stderr,"An unknown error occurred during mlock() with errno: %i.\n", errornum);
     }
 }
+
+void munlock_error_msg(int errornum)
+{
+    switch(errornum)
+    {
+    case EPERM:
+        fprintf(stderr,"The caller is not privileged, but needs privilege to perform the requested operation.\n");
+        break;
+    default:
+        fprintf(stderr,"An unknown error occurred during mlock() with errno: %i.\n", errornum);
+    }
+}
