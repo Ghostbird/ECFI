@@ -51,13 +51,14 @@ Activity diagram of the CFI-Checker.
 
 ## Optimisation points:
 - Use thread instead of separate process for the checker
-- Assume library calls are well-behaved and remove certain checks in ringbuffer.c:rb\_read()
 
 ## Known issues:
 - rb_destroy is too aggressive. This will cause problems in certain cases. Needs to be fixed.
 - Check correct memory usage of structs (maybe use offsetof)
 - If the checker is aborted it may be necessary to manually delete the ringbuffer: ```rm /dev/shm/rb_cfi_*```
+- Ring buffer is (world?) writable.
+- Ringbuffer administration has critical sections. Need to verify whether violating them only causes data loss, or invalidates program invariants.
 
 ## Real-Time Features:
 - Priority handling using Ringbuffer
-- Implementation without using any Kernel API with generic spinlocks. 
+- Lock free implementation
