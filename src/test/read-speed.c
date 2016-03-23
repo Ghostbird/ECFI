@@ -15,10 +15,9 @@ int main()
         fprintf(stderr, "Could not create ringbuffer. Abort.\n");
         exit(EXIT_FAILURE);
     }
-    ringbuffer_t *rb = rb_info->rb;
     /* This is a hack. It invalidates writing, but it also allows us to read unimpeded. */
-    rb->write = rb->size + WRITE_DATACOUNT;
-    uint32_t data[] = {0};
+    rb_info->rb->write = rb_info->rb->size + WRITE_DATACOUNT;
+    uint32_t data[WRITE_DATACOUNT] = {0};
     struct timespec starttime;
     struct timespec endtime;
     if (clock_gettime(CLOCK_REALTIME, &starttime) < 0)
@@ -29,7 +28,7 @@ int main()
     }
     for (uint32_t i = 0; i < BUFSIZE * BUFCOUNT; i++)
     {
-        rb_read(rb, data, WRITE_DATACOUNT);
+        rb_read(rb_info->rb, data, WRITE_DATACOUNT);
     }
     if (clock_gettime(CLOCK_REALTIME, &endtime) < 0)
     {
@@ -38,5 +37,12 @@ int main()
         exit(EXIT_FAILURE);
     }
     printf("It took %li seconds and %li nanoseconds to read %i buffer entries %i times.\n", endtime.tv_sec - starttime.tv_sec, endtime.tv_nsec - starttime.tv_nsec, BUFSIZE, BUFCOUNT);
-    rb_destroy(rb_info);
+    if (rb_info == NULL)
+    {
+        fprintf(stderr, "How can this be? rb_info = %p.\n", (void *)rb_info);
+    }
+    else
+    {
+        rb_destroy(rb_info);
+    }
 }
