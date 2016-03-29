@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
             printf("Program: Running %s\n", argv[1]);
             fflush(stdout);
             execvp(argv[1], &argv[1]);
-            fprintf(stderr, "Program: execv() has failed.\n");
+            fprintf(stderr, "Program: execvp() has failed.\n");
         }
         /* Exit forked process on failure. */
         exit(EXIT_FAILURE);
