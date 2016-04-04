@@ -270,8 +270,10 @@ void rb_write_attached(const regval_t data[8])
     regval_t* r5 = rb_writer_buffer + *rb_writer_write;
     memcpy((void*)r5, (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
     r5 += WRITE_DATACOUNT;
+    /* Wrap linear memory space. */
     if (r5 == rb_writer_end)
         r5 = rb_writer_buffer;
+    /* Kick forward the read pointer on an overwrite. */
     if (rb_writer_buffer + *rb_writer_read ==  r5)
         *rb_writer_read = (uint32_t)(r5 - rb_writer_buffer) + WRITE_DATACOUNT;
     *rb_writer_write = (uint32_t)(r5 - rb_writer_buffer);
