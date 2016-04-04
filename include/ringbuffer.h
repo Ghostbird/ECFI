@@ -116,3 +116,8 @@ ringbuffer_t *rb_attach(int fd);
     Attaches to ringbuffer on file descriptor 3
     Sets the global variables rb_writer_... */
 void rb_init_writer();
+
+/*! Write to buffer after rb_init_writer() has been called once. 
+    This is a C function that writes to the buffer in a way closer to
+    what the injected assembly will do.*/
+void rb_write_attached(const regval_t data[8]);

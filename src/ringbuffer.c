@@ -264,3 +264,15 @@ void rb_init_writer()
     rb_writer_buffer = (regval_t*)(rb + 1);
     rb_writer_end = rb_writer_buffer + rb->size;
 }
+
+void rb_write_attached(const regval_t data[8])
+{
+    regval_t* r5 = rb_writer_buffer + *rb_writer_write;
+    memcpy((void*)r5, (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
+    r5 += WRITE_DATACOUNT;
+    if (r5 == rb_writer_end)
+        r5 = rb_writer_buffer;
+    if (rb_writer_buffer + *rb_writer_read ==  r5)
+        *rb_writer_read = (uint32_t)(r5 - rb_writer_buffer) + WRITE_DATACOUNT;
+    *rb_writer_write = (uint32_t)(r5 - rb_writer_buffer);
+}
