@@ -255,3 +255,12 @@ ringbuffer_t *rb_attach(int fd)
     }
     return rb;
 }
+
+void rb_init_writer()
+{
+    ringbuffer_t *rb = rb_attach(3);
+    rb_writer_read = &(rb->read);
+    rb_writer_write = &(rb->write);
+    rb_writer_buffer = (regval_t*)(rb + 1);
+    rb_writer_end = rb_writer_buffer + rb->size;
+}

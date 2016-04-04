@@ -59,6 +59,15 @@ struct ringbuffer_info
 /*! The ringbuffer_info_t typedef */
 typedef struct ringbuffer_info ringbuffer_info_t;
 
+/*! Global pointer to read index used to optimise the writer */
+uint32_t *rb_writer_read;
+/*! Global pointer to write index used to optimise the writer */
+uint32_t *rb_writer_write;
+/*! Global pointer to buffer start used to optimise the writer */
+regval_t *rb_writer_buffer;
+/*! Global pointer to buffer end used to optimise the writer */
+regval_t *rb_writer_end;
+
 /*! Create a new ringbuffer
     \param  bufsize  The size of the ring buffer in bytes.
     \param  bufname  Name of the ring buffer. Must conform to shm_open(3).
@@ -102,3 +111,8 @@ void rb_write(const regval_t data[8], ringbuffer_t *rbptr);
     \return    A pointer to the ringbuffer_t object stored in the file.
 */
 ringbuffer_t *rb_attach(int fd);
+
+/*! Initialisation function for the writer.
+    Attaches to ringbuffer on file descriptor 3
+    Sets the global variables rb_writer_... */
+void rb_init_writer();
