@@ -258,7 +258,9 @@ ringbuffer_t *rb_attach(int fd)
 
 void rb_init_writer()
 {
+//    extern uint32_t *rb_writer_read;
     ringbuffer_t *rb = rb_attach(3);
+    fprintf(stderr, "Attached to ringbuffer, pointer: %p", (void*)rb);
     rb_writer_read = &(rb->read);
     rb_writer_write = &(rb->write);
     rb_writer_buffer = (regval_t*)(rb + 1);
