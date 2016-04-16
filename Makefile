@@ -58,7 +58,7 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 
 bin/BOF4: CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -Wall
 
-.PHONY: all tests objs shlibs runtests clean install doc debug
+.PHONY: all tests objs shlibs runtests clean install doc debug runbof
 
 all: bin/cfi-checker tests
 
@@ -86,6 +86,9 @@ runtests: tests
 
 valgrind: tests
 	@for f in $(TBDIR)/*; do echo "==========Running Valgrind on `basename $$f`=========="; LD_PRELOAD=$(SHLIB) LD_PRELOAD=$(SHLIB) valgrind --leak-check=full $$f; done
+
+runbof: bin/BOF4 bin/cfi-checker
+	LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/BOF4
 
 # Remove all generated files.
 clean:
