@@ -1,5 +1,6 @@
 # Define directories for the project.
 IDIR=include
+ADIR=asm
 BDIR=bin
 SDIR=src
 DDIR=doc
@@ -56,7 +57,14 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-bin/BOF4: CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -Wall
+$(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ADIR)
+	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	mv $(notdir $@) $@
+
+bin/BOF4: CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -Wall $(DEBUG)
+
+asm/BOF4.s: CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -Wall $(DEBUG)
 
 .PHONY: all tests objs shlibs runtests clean install doc debug runbof
 
@@ -87,7 +95,7 @@ runtests: tests
 valgrind: tests
 	@for f in $(TBDIR)/*; do echo "==========Running Valgrind on `basename $$f`=========="; LD_PRELOAD=$(SHLIB) LD_PRELOAD=$(SHLIB) valgrind --leak-check=full $$f; done
 
-runbof: bin/BOF4 bin/cfi-checker
+runbof: bin/BOF4 asm/BOF4.s bin/cfi-checker
 	LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/BOF4
 
 # Remove all generated files.

@@ -15,6 +15,12 @@ A (non-exhaustive) list of software necessary to build the project
 make
 ```
 
+### Compile to assembly ###
+To compile to assembly (for example the BOF4.c file):
+```bash
+make asm/BOF4.s
+```
+
 ## Testing
 To compile and test the ringbuffer library:
 ```bash
@@ -24,6 +30,12 @@ To compile and test the CFI executable:
 ```bash
 make -B all
 LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test
+```
+
+To compile and test the BOF4 executable:
+```bash
+make -B all
+LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/BOF4
 ```
 
 ## Debugging
