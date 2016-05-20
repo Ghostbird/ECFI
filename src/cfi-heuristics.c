@@ -43,7 +43,7 @@ int cfi_record(const regval_t data[WRITE_DATACOUNT])
     /* Check whether all the data was written. */
     if (count < WRITE_DATACOUNT)
     {
-        fprintf(stderr, "Error: Not all data has been recorded! Recorded %lu of %lu values.\n", count, (long unsigned int)(WRITE_DATACOUNT)); 
+        fprintf(stderr, "Error: Not all data has been recorded! Recorded %u of %u values.\n", count, (unsigned int)(WRITE_DATACOUNT)); 
     }
     if (fclose(record) != 0)
     {
@@ -55,6 +55,10 @@ int cfi_record(const regval_t data[WRITE_DATACOUNT])
 
 int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
 {
+    /* Keep track of the number of times this function is called. */
+    static uint32_t step = 0;
+    /* Static buffer to store read data. No need to reallocate every time. (TODO: check safety) */
+    static regval_t buffer[WRITE_DATACOUNT];
     /* Open file RECORDNAME for reading. */
     FILE *record = fopen(RECORDNAME,"rb");
     /* Check for failure to open file. */
@@ -63,10 +67,8 @@ int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
         fprintf(stderr, "Error: Failed to open record for reading! fopen() returned NULL with error code %d.", errno);
         return -1;
     }
-    /* Keep track of the number of times this function is called. */
-    static uint32_t step = 0;
-    /* Static buffer to store read data. */
-    static regval_t buffer[WRITE_DATACOUNT];
+    /* Move file position indicator to correct location in file. */
+    fseek(record, WRITE_DATACOUNT * sizeof(regval_t) * step, SEEK_SET);
     /* Read data from file. */
     size_t count = fread(buffer, sizeof(regval_t), WRITE_DATACOUNT, record);
     /* Check whether the read from the record went well. */
@@ -87,8 +89,15 @@ int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
         if (memcmp(data, buffer, WRITE_DATACOUNT * sizeof(regval_t)) != 0)
         {
             fprintf(stdout, "Original record, and current program run are not identical in step %d:\n", step);
-            fprintf(stdout, "LR: %x\nPC: %x\nSP: %x\nFP: %x\n", data[0], data[1], data[2], data[3]);
-            fprintf(stdout, "R1: %x\nR2: %x\nR3: %x\nR4: %x\n", data[4], data[5], data[6], data[7]);
+            fprintf(stdout, "        Original                Current\n");
+            fprintf(stdout, "LR: %016x    %016x\n", buffer[0], data[0]);
+            fprintf(stdout, "PC: %016x    %016x\n", buffer[1], data[1]);
+            fprintf(stdout, "SP: %016x    %016x\n", buffer[2], data[2]);
+            fprintf(stdout, "FP: %016x    %016x\n", buffer[3], data[3]);
+            fprintf(stdout, "R1: %016x    %016x\n", buffer[4], data[4]);
+            fprintf(stdout, "R2: %016x    %016x\n", buffer[5], data[5]);
+            fprintf(stdout, "R3: %016x    %016x\n", buffer[6], data[6]);
+            fprintf(stdout, "R4: %016x    %016x\n", buffer[7], data[7]);
         }
     }
     if (fclose(record) != 0)
@@ -96,5 +105,6 @@ int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
         fprintf(stderr, "Error: Failed to close record! fclose() returned nonzero with error code %d.", errno);
         return -1;
     }
+    step += 1;
     return 0;
 }
