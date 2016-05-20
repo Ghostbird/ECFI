@@ -1,5 +1,8 @@
 # Compiled source #
 bin
 
+# Generated assembly #
+asm
+
 # Generated documentation
 doc
