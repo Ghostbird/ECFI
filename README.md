@@ -15,15 +15,36 @@ A (non-exhaustive) list of software necessary to build the project
 make
 ```
 
+### Compile to assembly ###
+To compile to assembly (for example the BOF4.c file):
+```bash
+make asm/BOF4.s
+```
+
 ## Testing
 To compile and test the ringbuffer library:
 ```bash
 make runtests
 ```
-To compile and test the CFI executable:
+To test the record write/verify functionality:
+1. Open src/cfi-checker.c
+2. Comment lines 28 and 30. (cfi_print and cfi_check_record)
+3. Uncomment line 29 (cfi_record)
+4. Compile and run once.```bash
+make -B bin/cfi-checker bin/injection-test
+LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test
+```
+5. Open src/cfi-checker.c again.
+6. Comment line 29 (cfi_record)
+7. Uncomment line 30 (cfi_check_record)
+8. Compile again.
+9. Run again.
+10. Check the files checker.out and checker.err for messages. If there are no errors, the check succeeded. If the behaviour was different at some point, you will be show a summary of the differences.
+
+To compile and test the BOF4 executable:
 ```bash
 make -B all
-LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test
+LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/BOF4
 ```
 
 ## Debugging
