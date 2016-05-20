@@ -24,7 +24,7 @@ void checker(ringbuffer_info_t *rb_info)
         /* Read all available data. */
         while (rb_read(rb_info->rb, data, WRITE_DATACOUNT) != NULL)
         {
-            cfi_print(data);
+            cfi_record(data);
         }
     sched_yield();
     }

@@ -16,8 +16,8 @@ Take care that size is not allowed to be so big that it overflows the uint32_t m
 */
 #define MOD(a,b) ((((a) % (b)) + (b)) % (b))
 
-/*! The type of a register value is defined as a 32 bit integer. */
-typedef uint32_t regval_t;
+/*! The type of a register value is defined as an integer. */
+typedef unsigned int regval_t;
 
 /*! This is a ring buffer structure
 
