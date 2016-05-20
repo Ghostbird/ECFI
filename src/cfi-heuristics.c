@@ -89,7 +89,7 @@ int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
         if (memcmp(data, buffer, WRITE_DATACOUNT * sizeof(regval_t)) != 0)
         {
             fprintf(stdout, "Original record, and current program run are not identical in step %d:\n", step);
-            fprintf(stdout, "        Original                Current\n");
+            fprintf(stdout, "        Original            Current\n");
             fprintf(stdout, "LR: %016x    %016x\n", buffer[0], data[0]);
             fprintf(stdout, "PC: %016x    %016x\n", buffer[1], data[1]);
             fprintf(stdout, "SP: %016x    %016x\n", buffer[2], data[2]);
