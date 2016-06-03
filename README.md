@@ -84,3 +84,12 @@ Activity diagram of the CFI-Checker.
 - Priority handling using Ringbuffer
 - Lock free implementation
 - Formally verifiable hard Real-Time in the injected code.
+
+## Todo:
+C function for injection:
+- get previous frame pointer
+- calculate function arguments
+- calculate stack pointer
+
+ANGR:
+- Function arguments in CFG.

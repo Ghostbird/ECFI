@@ -43,7 +43,7 @@ int cfi_record(const regval_t data[WRITE_DATACOUNT])
     /* Check whether all the data was written. */
     if (count < WRITE_DATACOUNT)
     {
-        fprintf(stderr, "Error: Not all data has been recorded! Recorded %u of %u values.\n", count, (unsigned int)(WRITE_DATACOUNT)); 
+        fprintf(stderr, "Error: Not all data has been recorded! Recorded %lu of %lu values.\n", (unsigned long int)count, (unsigned long int)(WRITE_DATACOUNT)); 
     }
     if (fclose(record) != 0)
     {
