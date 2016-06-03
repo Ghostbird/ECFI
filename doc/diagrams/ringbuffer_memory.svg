@@ -1,198 +1,143 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="31cm" height="28cm" viewBox="859 -1 604 556" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <g>
-    <rect style="fill: #ffffff" x="1120" y="20" width="40" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="1120" y="20" width="40" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="880" y="20" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="880" y="20" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="880" y="160" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="880" y="160" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1360" y="160" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="1360" y="160" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1360" y="300" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="1360" y="300" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1000" y="300" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="1000" y="300" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="880" y="440" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="880" y="440" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1200" y="440" width="240" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="1200" y="440" width="240" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1120" y="440" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1120" y="440" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1040" y="440" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1040" y="440" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="960" y="440" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="440" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1080" y="300" width="200" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x="1080" y="300" width="200" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1280" y="300" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1280" y="300" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="960" y="160" width="160" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="160" width="160" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1200" y="160" width="160" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1200" y="160" width="160" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="1120" y="160" width="80" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1120" y="160" width="80" height="60"/>
-  </g>
-  <g>
-    <rect style="fill: #ffffff" x="960" y="20" width="160" height="60"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="960" y="20" width="160" height="60"/>
-  </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="180">
-    <tspan x="980" y="180">ringbuffer_t*</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1060" y="460">
-    <tspan x="1060" y="460">uint32_t</tspan>
-    <tspan x="1060" y="476">read</tspan>
-    <tspan x="1060" y="492">index</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1140" y="460">
-    <tspan x="1140" y="460">uint32_t</tspan>
-    <tspan x="1140" y="476">write</tspan>
-    <tspan x="1140" y="492">index</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="460">
-    <tspan x="980" y="460">uint32_t</tspan>
-    <tspan x="980" y="476">size</tspan>
-  </text>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="440" x2="1200" y2="500"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="860" y1="500" x2="960" y2="500"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="860" y1="440" x2="960" y2="440"/>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" points="1280,180 1280,260 1080,260 1080,295.528 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1075,287.764 1080,297.764 1085,287.764 "/>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="960" y1="540" x2="960" y2="504.472"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="965,512.236 960,502.236 955,512.236 "/>
-  </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="920" y="551">
-    <tspan x="920" y="551">Page boundary of mmap-ed shared memory.</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="460">
-    <tspan x="1220" y="460">unit of type regval_t</tspan>
-    <tspan x="1220" y="476">repeated “size” times</tspan>
-  </text>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1080" y1="300" x2="1220" y2="300"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1080" y1="360" x2="1220" y2="360"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1080" y1="300" x2="1080" y2="360"/>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1300" y="320">
-    <tspan x="1300" y="320">null</tspan>
-    <tspan x="1300" y="336">char</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1100" y="320">
-    <tspan x="1100" y="320">char[] buffer name</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1140" y="180">
-    <tspan x="1140" y="180">int</tspan>
-    <tspan x="1140" y="196">fd</tspan>
-  </text>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="180">
-    <tspan x="1220" y="180">char*</tspan>
-    <tspan x="1220" y="196">name</tspan>
-  </text>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" points="1040,200 1040,260 960,260 960,435.528 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="955,427.764 960,437.764 965,427.764 "/>
-  </g>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="980" y1="360" x2="1080" y2="360"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="980" y1="300" x2="1080" y2="300"/>
-  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="980" y="40">
-    <tspan x="980" y="40">ringbuffer_info_t*</tspan>
-  </text>
-  <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" points="1040,60 1040,120 960,120 960,155.528 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="955,147.764 960,157.764 965,147.764 "/>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="1120" y1="80" x2="1170.26" y2="80"/>
-    <polygon style="fill: #000000" points="1177.76,80 1167.76,85 1170.26,80 1167.76,75 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1177.76,80 1167.76,85 1170.26,80 1167.76,75 "/>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="1120" y1="20" x2="1170.26" y2="20"/>
-    <polygon style="fill: #000000" points="1177.76,20 1167.76,25 1170.26,20 1167.76,15 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1177.76,20 1167.76,25 1170.26,20 1167.76,15 "/>
-  </g>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="860" y1="80" x2="960" y2="80"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="860" y1="20" x2="960" y2="20"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1260" y1="300" x2="1280" y2="300"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1260" y1="360" x2="1280" y2="360"/>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="1360" y1="360" x2="1450.26" y2="360"/>
-    <polygon style="fill: #000000" points="1457.76,360 1447.76,365 1450.26,360 1447.76,355 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1457.76,360 1447.76,365 1450.26,360 1447.76,355 "/>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="1360" y1="300" x2="1450.26" y2="300"/>
-    <polygon style="fill: #000000" points="1457.76,300 1447.76,305 1450.26,300 1447.76,295 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1457.76,300 1447.76,305 1450.26,300 1447.76,295 "/>
-  </g>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="860" y1="220" x2="960" y2="220"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="860" y1="160" x2="960" y2="160"/>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="1360" y1="220" x2="1450.26" y2="220"/>
-    <polygon style="fill: #000000" points="1457.76,220 1447.76,225 1450.26,220 1447.76,215 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1457.76,220 1447.76,225 1450.26,220 1447.76,215 "/>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 20; stroke: #000000" x1="1360" y1="160" x2="1450.26" y2="160"/>
-    <polygon style="fill: #000000" points="1457.76,160 1447.76,165 1450.26,160 1447.76,155 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1457.76,160 1447.76,165 1450.26,160 1447.76,155 "/>
-  </g>
-  <g>
-    <polygon style="fill: #ffffff" points="1200,0 1437,0 1449,12 1449,130 1200,130 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1200,0 1437,0 1449,12 1449,130 1200,130 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="1437,0 1437,12 1449,12 "/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1207" y="24.9">
-      <tspan x="1207" y="24.9">Memory layout representation</tspan>
-      <tspan x="1207" y="40.9">of a ringbuffer attached to</tspan>
-      <tspan x="1207" y="56.9">a process. The four sections</tspan>
-      <tspan x="1207" y="72.9">shown are all part of linear</tspan>
-      <tspan x="1207" y="88.9">process virtual memory, but</tspan>
-      <tspan x="1207" y="104.9">no guarantee is given on their</tspan>
-      <tspan x="1207" y="120.9">order relative to each other.</tspan>
-    </text>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="440" x2="1450.26" y2="440"/>
-    <polygon style="fill: #000000" points="1457.76,440 1447.76,445 1450.26,440 1447.76,435 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1457.76,440 1447.76,445 1450.26,440 1447.76,435 "/>
-  </g>
-  <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="500" x2="1450.26" y2="500"/>
-    <polygon style="fill: #000000" points="1457.76,500 1447.76,505 1450.26,500 1447.76,495 "/>
-    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1457.76,500 1447.76,505 1450.26,500 1447.76,495 "/>
-  </g>
+<!-- Created by diasvg.py -->
+<svg width="30.162cm" height="27.750cm" viewBox="42.950 -0.050 73.112 27.700"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="56.000" y="1.000" width="2.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="56.000" y="1.000" width="2.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="44.000" y="1.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="44.000" y="1.000" width="4.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="44.000" y="8.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="44.000" y="8.000" width="4.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="68.000" y="8.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="68.000" y="8.000" width="4.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="68.000" y="15.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="68.000" y="15.000" width="4.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="50.000" y="15.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="50.000" y="15.000" width="4.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="44.000" y="22.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="44.000" y="22.000" width="4.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="60.000" y="22.000" width="12.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="60.000" y="22.000" width="12.000" height="3.000" fill="none" stroke="#FFFFFF" stroke-width="0.100" />
+<rect x="56.000" y="22.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="56.000" y="22.000" width="4.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="52.000" y="22.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="52.000" y="22.000" width="4.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="48.000" y="22.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="48.000" y="22.000" width="4.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="54.000" y="15.000" width="10.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="54.000" y="15.000" width="10.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.10,0.10"/>
+<rect x="64.000" y="15.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="64.000" y="15.000" width="4.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="48.000" y="8.000" width="8.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="48.000" y="8.000" width="8.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="60.000" y="8.000" width="8.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="60.000" y="8.000" width="8.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="56.000" y="8.000" width="4.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="56.000" y="8.000" width="4.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="48.000" y="1.000" width="8.000" height="3.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="48.000" y="1.000" width="8.000" height="3.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="49.000" y="9.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+ringbuffer_t*</text>
+<text x="53.000" y="23.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+uint32_t</text>
+<text x="53.000" y="23.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+read</text>
+<text x="53.000" y="24.600"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+index</text>
+<text x="57.000" y="23.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+uint32_t</text>
+<text x="57.000" y="23.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+write</text>
+<text x="57.000" y="24.600"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+index</text>
+<text x="49.000" y="23.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+uint32_t</text>
+<text x="49.000" y="23.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+size</text>
+<line x1="60.000" y1="22.000" x2="60.000" y2="25.000" stroke="#000000" stroke-width="0.100" />
+<line x1="43.000" y1="25.000" x2="48.000" y2="25.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<line x1="43.000" y1="22.000" x2="48.000" y2="22.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.10,0.10" points="64.000,9.000 64.000,13.000 54.000,13.000 54.000,14.776 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="53.750,14.388 54.000,14.888 54.250,14.388 "/>
+<line x1="48.000" y1="27.000" x2="48.000" y2="25.224" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.10,0.10"/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="48.250,25.612 48.000,25.112 47.750,25.612 "/>
+<text x="46.000" y="27.550"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Page boundary of mmap-ed shared memory.</text>
+<text x="61.000" y="23.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+unit of type regval_t</text>
+<text x="61.000" y="23.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+repeated &quot;size&quot; times</text>
+<line x1="54.000" y1="15.000" x2="61.000" y2="15.000" stroke="#000000" stroke-width="0.100" />
+<line x1="54.000" y1="18.000" x2="61.000" y2="18.000" stroke="#000000" stroke-width="0.100" />
+<line x1="54.000" y1="15.000" x2="54.000" y2="18.000" stroke="#000000" stroke-width="0.100" />
+<text x="65.000" y="16.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+null</text>
+<text x="65.000" y="16.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+char</text>
+<text x="55.000" y="16.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+char[] buffer name</text>
+<text x="57.000" y="9.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+int</text>
+<text x="57.000" y="9.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+fd</text>
+<text x="61.000" y="9.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+char*</text>
+<text x="61.000" y="9.800"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+name</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.10,0.10" points="52.000,10.000 52.000,13.000 48.000,13.000 48.000,21.776 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="47.750,21.388 48.000,21.888 48.250,21.388 "/>
+<line x1="49.000" y1="18.000" x2="54.000" y2="18.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<line x1="49.000" y1="15.000" x2="54.000" y2="15.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<text x="49.000" y="2.000"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+ringbuffer_info_t*</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.10,0.10" points="52.000,3.000 52.000,6.000 48.000,6.000 48.000,7.776 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="47.750,7.388 48.000,7.888 48.250,7.388 "/>
+<line x1="56.000" y1="4.000" x2="58.513" y2="4.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="58.888,4.000 58.388,4.250 58.513,4.000 58.388,3.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="58.888,4.000 58.388,4.250 58.513,4.000 58.388,3.750 "/>
+<line x1="56.000" y1="1.000" x2="58.513" y2="1.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="58.888,1.000 58.388,1.250 58.513,1.000 58.388,0.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="58.888,1.000 58.388,1.250 58.513,1.000 58.388,0.750 "/>
+<line x1="43.000" y1="4.000" x2="48.000" y2="4.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<line x1="43.000" y1="1.000" x2="48.000" y2="1.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<line x1="63.000" y1="15.000" x2="64.000" y2="15.000" stroke="#000000" stroke-width="0.100" />
+<line x1="63.000" y1="18.000" x2="64.000" y2="18.000" stroke="#000000" stroke-width="0.100" />
+<line x1="68.000" y1="18.000" x2="72.513" y2="18.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="72.888,18.000 72.388,18.250 72.513,18.000 72.388,17.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="72.888,18.000 72.388,18.250 72.513,18.000 72.388,17.750 "/>
+<line x1="68.000" y1="15.000" x2="72.513" y2="15.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="72.888,15.000 72.388,15.250 72.513,15.000 72.388,14.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="72.888,15.000 72.388,15.250 72.513,15.000 72.388,14.750 "/>
+<line x1="43.000" y1="11.000" x2="48.000" y2="11.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<line x1="43.000" y1="8.000" x2="48.000" y2="8.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<line x1="68.000" y1="11.000" x2="72.513" y2="11.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="72.888,11.000 72.388,11.250 72.513,11.000 72.388,10.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="72.888,11.000 72.388,11.250 72.513,11.000 72.388,10.750 "/>
+<line x1="68.000" y1="8.000" x2="72.513" y2="8.000" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="72.888,8.000 72.388,8.250 72.513,8.000 72.388,7.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="72.888,8.000 72.388,8.250 72.513,8.000 72.388,7.750 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="60.000,0.000 71.850,0.000 72.450,0.600 72.450,6.500 60.000,6.500 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="60.000,0.000 71.850,0.000 72.450,0.600 72.450,6.500 60.000,6.500 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.050"  points="71.850,0.000 71.850,0.600 72.450,0.600 "/>
+<text x="60.350" y="1.245"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+Memory layout representation</text>
+<text x="60.350" y="2.045"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+of a ringbuffer attached to</text>
+<text x="60.350" y="2.845"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+a process. The four sections</text>
+<text x="60.350" y="3.645"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+shown are all part of linear</text>
+<text x="60.350" y="4.445"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+process virtual memory, but</text>
+<text x="60.350" y="5.245"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+no guarantee is given on their</text>
+<text x="60.350" y="6.045"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+order relative to each other.</text>
+<line x1="60.000" y1="22.000" x2="72.513" y2="22.000" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="72.888,22.000 72.388,22.250 72.513,22.000 72.388,21.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="72.888,22.000 72.388,22.250 72.513,22.000 72.388,21.750 "/>
+<line x1="60.000" y1="25.000" x2="72.513" y2="25.000" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="72.888,25.000 72.388,25.250 72.513,25.000 72.388,24.750 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="72.888,25.000 72.388,25.250 72.513,25.000 72.388,24.750 "/>
 </svg>
