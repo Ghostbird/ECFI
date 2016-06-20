@@ -172,3 +172,72 @@ void munlock_error_msg(int errornum)
         fprintf(stderr,"An unknown error occurred during mlock() with errno: %i.\n", errornum);
     }
 }
+
+void exec_error_msg(int errornum)
+{
+    switch(errornum)
+    {
+    case E2BIG:
+        fprintf(stderr,"The total number of bytes in the environment (envp) and argument list (argv) is too large.\n");
+        break;
+    case EACCES:
+        fprintf(stderr,"EITHER Search permission is denied on a component of the path prefix of filename or the name of a script interpreter.\n");
+        fprintf(stderr,"OR The file or a script interpreter is not a regular file.\n");
+        fprintf(stderr,"OR Execute permission is denied for the file or a script or ELF interpreter.\n");
+        fprintf(stderr,"OR The filesystem is mounted noexec.\n");
+        break;
+    case EAGAIN:
+        fprintf(stderr,"Having changed its real UID using one of the set*uid() calls, the caller was—and is now still—above its RLIMIT_NPROC resource limit.\n");
+        break;
+    case EFAULT:
+        fprintf(stderr,"filename or one of the pointers in the vectors argv or envp points outside your accessible address space.\n");
+        break;
+    case EINVAL:
+        fprintf(stderr,"An ELF executable had more than one PT_INTERP segment (i.e., tried to name more than one interpreter).\n");
+        break;
+    case EIO:
+        fprintf(stderr,"An I/O error occurred.\n");
+        break;
+    case EISDIR:
+        fprintf(stderr,"An ELF interpreter was a directory\n");
+        break;
+    case ELIBBAD:
+        fprintf(stderr,"An ELF interpreter was not in a recognized format\n");
+        break;
+    case ELOOP:
+        fprintf(stderr,"EITHER Too many symbolic links were encountered in resolving filename or the name of a script or ELF interpreter.\n");
+        fprintf(stderr,"OR The maximum recursion limit was reached during recursive script interpretation.\n");
+        break;
+    case EMFILE:
+        fprintf(stderr,"The per-process limit on the number of open file descriptors has been reached.\n");
+        break;
+    case ENAMETOOLONG:
+        fprintf(stderr,"Argument filename is too long.\n");
+        break;
+    case ENFILE:
+        fprintf(stderr,"The system-wide limit on the total number of open files has been reached.\n");
+        break;
+    case ENOENT:
+        fprintf(stderr,"The file filename or a script or ELF interpreter does not exist, or a shared library needed for the file or interpreter cannot be found.\n");
+        break;
+    case ENOEXEC:
+        fprintf(stderr,"An executable is not in a recognized format, is for the wrong architecture, or has some other format error that means it cannot be executed.\n");
+        break;
+    case ENOMEM:
+        fprintf(stderr,"Insufficient kernel memory was available.\n");
+        break;
+    case ENOTDIR:
+        fprintf(stderr,"A component of the path prefix of filename or a script or ELF interpreter is not a directory.\n");
+        break;
+    case EPERM:
+        fprintf(stderr,"EITHER The filesystem is mounted nosuid, the user is not the superuser, and the file has the set-user-ID or set-group-ID bit set.\n");
+        fprintf(stderr,"OR The process is being traced, the user is not the superuser and the file has the set-user-ID or set-group-ID bit set.\n");
+        fprintf(stderr,"OR A \"capability-dumb\" application would not obtain the full set of permitted capabilities granted by the executable file.\n");
+        break;
+    case ETXTBSY:
+        fprintf(stderr,"The specified executable was open for writing by one or more processes.\n");
+        break;
+    default:
+        fprintf(stderr,"An unknown error occurred during exec*() with errno: %i.\n", errornum);
+    }
+}
