@@ -14,7 +14,7 @@ TBDIR=$(BDIR)/$(TDIR)
 # Define compilation options for the project.
 
 # Compiler choice.
-CC=gcc
+CC?=gcc
 #Compilation flags, includes, libraries, standard and error/warnings.
 CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -std=c99 -pedantic-errors -Wall -Wextra -Werror $(DEBUG)
 # Compilation options to compile an object file (*.o) to a shared object library (*.so)
