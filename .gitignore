@@ -1,6 +1,9 @@
 # Compiled source #
 bin
 
+# Python cache
+__pycache__
+
 # Generated assembly #
 asm
 
