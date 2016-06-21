@@ -9,3 +9,6 @@ asm
 
 # Generated documentation
 doc
+
+# Python cache
+__pycache__

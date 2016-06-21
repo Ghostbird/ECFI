@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="28cm" height="18cm" viewBox="439 127 542 341" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <ellipse style="fill: #ffffff" cx="736.724" cy="410.088" rx="56.724" ry="56.724"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="736.724" cy="410.088" rx="56.724" ry="56.724"/>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="736.724" cy="410.086" rx="35.7422" ry="35.7422"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="736.724" cy="410.086" rx="35.7422" ry="35.7422"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="440" y="360" width="160" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="360" width="160" height="80"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="520" y="371.9">
+    <tspan x="520" y="371.9">real-time program</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="460" y="380.088" width="140" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="380.088" width="140" height="60"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="530" y="412.538">
+    <tspan x="530" y="412.538">injected CFI code</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="736.724" y="413.038">
+    <tspan x="736.724" y="413.038">buffer</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="600" y1="410.088" x2="675.528" y2="410.088"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="667.764,415.088 677.764,410.088 667.764,405.088 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="640" y="404.038">
+    <tspan x="640" y="404.038">write</tspan>
+    <tspan x="640" y="420.038"></tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="860" y="380.088" width="120" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="860" y="380.088" width="120" height="60"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="920" y="396.538">
+    <tspan x="920" y="396.538">non-real-time</tspan>
+    <tspan x="920" y="412.538">best-effort</tspan>
+    <tspan x="920" y="428.538">CFI verification</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="860" y1="410.088" x2="797.92" y2="410.088"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="805.684,405.088 795.684,410.088 805.684,415.088 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="826.724" y="404.038">
+    <tspan x="826.724" y="404.038">read</tspan>
+    <tspan x="826.724" y="420.038"></tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="710" y="300" width="80" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="710" y="300" width="80" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="750" y="314.45">
+    <tspan x="750" y="314.45">heuristic</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="800" y="300" width="70" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="300" width="70" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="835" y="314.45">
+    <tspan x="835" y="314.45">heuristic</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="880" y="300" width="80" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="880" y="300" width="80" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="920" y="314.45">
+    <tspan x="920" y="314.45">heuristic</tspan>
+  </text>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="736.724" y1="353.364" x2="736.724" y2="374.344"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="696.614" y1="369.978" x2="711.45" y2="384.814"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="700.982" y1="410.088" x2="680" y2="410.088"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="711.45" y1="435.36" x2="696.614" y2="450.198"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="736.724" y1="445.83" x2="736.724" y2="466.812"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="761.998" y1="435.36" x2="776.834" y2="450.198"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="772.466" y1="410.088" x2="793.448" y2="410.088"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="761.998" y1="384.814" x2="776.834" y2="369.978"/>
+  <g>
+    <rect style="fill: #ffffff" x="440" y="240" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="240" width="160" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="520" y="251.9">
+    <tspan x="520" y="251.9">Assembly injector</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="440" y="300" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="300" width="160" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="520" y="311.9">
+    <tspan x="520" y="311.9">Assembler</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="260.999" x2="520" y2="295.528"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,287.764 520,297.764 525,287.764 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="320" x2="520" y2="355.528"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,347.764 520,357.764 525,347.764 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="670" y="180" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="670" y="180" width="160" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="750" y="191.9">
+    <tspan x="750" y="191.9">CFG Generator</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="670" y="240" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="670" y="240" width="160" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="750" y="251.9">
+    <tspan x="750" y="251.9">Control Flow Graph</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="440" y="180" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="180" width="160" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="520" y="191.9">
+    <tspan x="520" y="191.9">Program assembly</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="600.933" y1="190" x2="665.528" y2="190"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="657.764,195 667.764,190 657.764,185 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="200" x2="520" y2="235.528"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,227.764 520,237.764 525,227.764 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="750" y1="200.999" x2="750" y2="235.528"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="745,227.764 750,237.764 755,227.764 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="669.067" y1="250" x2="604.472" y2="250"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="612.236,245 602.236,250 612.236,255 "/>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="750" y1="299.102" x2="750" y2="260.898"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="819.561" y1="299.102" x2="765.439" y2="260.898"/>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="867.352" y1="379.092" x2="772.541" y2="323.271"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="781.768,322.901 770.614,322.137 776.695,331.519 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="893.676" y1="379.092" x2="847.238" y2="324.411"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="856.075,327.092 845.791,322.706 848.453,333.565 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="920" y1="379.092" x2="920" y2="325.474"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="925,333.238 920,323.238 915,333.238 "/>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="889.121" y1="299.102" x2="780.879" y2="260.898"/>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="150" x2="520" y2="175.528"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="130" x2="520" y2="134"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="136.667" x2="520" y2="140.667"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="143.333" x2="520" y2="147.333"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,167.764 520,177.764 525,167.764 "/>
+  </g>
+</svg>
