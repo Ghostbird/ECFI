@@ -22,5 +22,5 @@
         MOV     r8, r6  @r8 holds rb base - avoid memory access
         MOV     r8, #8
         SUB     r5, r5, r8
-        STR     r5, [r6] @causes seg fault
+        STR     r5, [r6] @fixed seg fault with additional LDR in line 20
         POP     {R5, R6, R8}
