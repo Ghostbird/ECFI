@@ -16,9 +16,10 @@ make
 ```
 
 ### Compile to assembly ###
-To compile to assembly (for example the BOF4.c file):
+To compile to assembly (for example the BOF4.c file) and then to binary:
 ```bash
 make asm/BOF4.s
+gcc -lrt bin/lib/libringbuffer.so bin/obj/errors.o asm/BOF4.s
 ```
 
 ## Testing

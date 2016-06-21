@@ -38,6 +38,12 @@ OBJ=$(patsubst %,$(ODIR)/%.o,$(_OBJ))
 _SHLIB=ringbuffer
 SHLIB=$(patsubst %,$(SHLIBDIR)/lib%.so,$(_SHLIB))
 
+# Name all PHONY rules.
+.PHONY: all tests objs shlibs runtests clean install doc debug runbof
+
+# First explicit target is default.
+all: bin/cfi-checker tests
+
 # Compile an object file from a source file
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 	mkdir -p $(ODIR)
@@ -48,27 +54,32 @@ $(SHLIBDIR)/lib%.so: $(ODIR)/%.o
 	mkdir -p $(SHLIBDIR)
 	$(CC) $(SHFLAGS) -o $@ $^
 
-# Compile a test from a test source file.
+# Compile a test from its source file.
 $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(TBDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
+# Compile the BOF4 binary which is special.
+bin/BOF4: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(BDIR)
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+
+# Compile the BOF4 assembly.
+asm/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ADIR)
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	mv $(notdir $@) $@
+
+# Compile a binary from its source file.
 $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
+# Compile assembly from its source file.
 $(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
 	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 	mv $(notdir $@) $@
-
-bin/BOF4: CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -Wall $(DEBUG)
-
-asm/BOF4.s: CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -Wall $(DEBUG)
-
-.PHONY: all tests objs shlibs runtests clean install doc debug runbof
-
-all: bin/cfi-checker tests
 
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
@@ -101,4 +112,4 @@ runbof: bin/BOF4 asm/BOF4.s bin/cfi-checker
 # Remove all generated files.
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
-	rm -rf $(DDIR)/html $(DDIR)/latex $(BDIR)
+	rm -rf $(DDIR)/html $(DDIR)/latex $(BDIR) $(ADIR) __pycache__
