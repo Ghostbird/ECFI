@@ -30,7 +30,7 @@ int main(int argc, char **argv){
 //    register int ecx3 asm("lr");
 //    printf("LR value before calling vuln() in main() is %p \n", ecx3);
     rb_init_writer();
-    printf("The value of ring buffer read pointer is %p", rb_writer_read);
+    printf("The value of ring buffer read pointer is %p\n", rb_writer_read);
     vuln(argv[1]);
     register int ecx2 asm("lr");
     printf("LR value after calling vuln() in main() is %p \n", ecx2);
