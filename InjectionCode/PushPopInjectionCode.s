@@ -17,8 +17,7 @@
         SUBEQ   r8, r5, r8 @r8 now contain r5-buffer+size -- Line 6
         LDREQ   r6, =0xb6fb9004
         STREQ   r8, [r6]  @ --line 7 and end of line 7 :P
-        LDR     r6, =0xb6fb9004
-        ADD     r6, #4  @r6 now hold w offset address
+        LDR     r6, =0xb6fb9008
         MOV     r8, r6  @r8 holds rb base - avoid memory access
         MOV     r8, #8
         SUB     r5, r5, r8
