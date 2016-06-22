@@ -1,7 +1,9 @@
 # Define directories for the project.
 IDIR=include
 ADIR=asm
+ARMCFGDIR=arm-cfg
 BDIR=bin
+CDIR=cfg
 SDIR=src
 DDIR=doc
 ODIR=$(BDIR)/obj
@@ -11,10 +13,14 @@ TDIR=test
 TSDIR=$(SDIR)/$(TDIR)
 TBDIR=$(BDIR)/$(TDIR)
 
+# Python version
+# PYTHON=python # Python 2
+PYTHON=python3
+
 # Define compilation options for the project.
 
 # Compiler choice.
-CC?=gcc
+CC=gcc
 #Compilation flags, includes, libraries, standard and error/warnings.
 CFLAGS=-D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) -std=c99 -pedantic-errors -Wall -Wextra -Werror $(DEBUG)
 # Compilation options to compile an object file (*.o) to a shared object library (*.so)
@@ -59,15 +65,21 @@ $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(TBDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
+# Compile the BOF4 assembly.
+$(ADIR)/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ADIR)
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	mv $(notdir $@) $@
+
 # Compile the BOF4 binary which is special.
 $(BDIR)/BOF4: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-# Compile the BOF4 assembly.
-$(ADIR)/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
+# Compile assembly from its source file.
+$(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
-	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 	mv $(notdir $@) $@
 
 # Compile a binary from its source file.
@@ -75,11 +87,15 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-# Compile assembly from its source file.
-$(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
-	mkdir -p $(ADIR)
-	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
-	mv $(notdir $@) $@
+# Compile CFG from assembly.
+$(CDIR)/%.cfg: CC:=$(CC)-with-$(PYTHON)
+$(CDIR)/%.cfg: CFLAGS+=-fplugin-arg-$(PYTHON)-script=cfggen.py
+$(CDIR)/%.cfg: $(BDIR)/% $(CDIR)
+	touch $@
+
+$(CDIR):
+	mkdir -p $(CDIR)
+
 
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
@@ -113,3 +129,4 @@ runbof: bin/BOF4 asm/BOF4.s bin/cfi-checker
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
 	rm -rf $(DDIR)/html $(DDIR)/latex $(BDIR) $(ADIR) __pycache__
+	if [ -d $(ARMCFGDIR) ]; then cd $(ARMCFGDIR); make clean; fi
