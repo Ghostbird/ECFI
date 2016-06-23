@@ -75,6 +75,7 @@ Example: Compile _src/injection-test.c_ and generate CFGs for all functions.
 make cfg/injection-test.cfg
 ```
 At the moment this creates a dummy _src/injection-test.c_ file and creates CFGs for every function compiled in the _cfg_ directory. The functions are in both DOT and SVG format.
+Note: If you want to cross-compile and generate CFGs you'll need the GCC Python plugin for your specific cross compiler. You'll probably have to compile it from source.
 
 ## Architecture ##
 Memory layout for ring buffer:
