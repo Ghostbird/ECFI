@@ -10,5 +10,5 @@ asm
 # Generated documentation
 doc
 
-# Python cache
-__pycache__
+# Generated CFGs
+cfg
