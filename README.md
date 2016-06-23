@@ -22,6 +22,12 @@ make asm/BOF4.s
 gcc -lrt bin/lib/libringbuffer.so bin/obj/errors.o asm/BOF4.s
 ```
 
+### Cross compiling
+Override the CC variable on the command line with your cross compiler:
+```bash
+make CC=arm-linux-gnueabihf-gcc bin/BOF4
+```
+
 ## Testing
 To compile and test the ringbuffer library:
 ```bash
@@ -61,6 +67,13 @@ To end up in the right process, you may have to `set follow-fork-mode child` at 
 make -B all
 LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker <path to executable>
 ```
+
+## Generate CFGs ##
+Example: Compile _src/injection-test.c_ and generate CFGs for all functions.
+```bash
+make cfg/injection-test.cfg
+```
+At the moment this creates a dummy _src/injection-test.c_ file and creates CFGs for every function compiled in the _cfg_ directory. The functions are in both DOT and SVG format.
 
 ## Architecture ##
 Memory layout for ring buffer:
