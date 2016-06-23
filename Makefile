@@ -88,10 +88,9 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 # Compile CFG from assembly.
-$(CDIR)/%.cfg: CC:=$(CC)-with-$(PYTHON)
-$(CDIR)/%.cfg: CFLAGS+=-fplugin-arg-$(PYTHON)-script=cfggen.py
-$(CDIR)/%.cfg: $(BDIR)/% $(CDIR)
-	touch $@
+$(CDIR)/%.cfg: CC:=$(CC)-with-$(PYTHON) cfggen.py
+$(CDIR)/%.cfg: $(CDIR) $(BDIR)/%
+	echo "This is a dummy file." > $@
 
 $(CDIR):
 	mkdir -p $(CDIR)
@@ -128,5 +127,5 @@ runbof: bin/BOF4 asm/BOF4.s bin/cfi-checker
 # Remove all generated files.
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
-	rm -rf $(DDIR)/html $(DDIR)/latex $(BDIR) $(ADIR) __pycache__
+	rm -rf $(DDIR)/html $(DDIR)/latex $(ADIR) $(BDIR) $(CDIR) __pycache__
 	if [ -d $(ARMCFGDIR) ]; then cd $(ARMCFGDIR); make clean; fi
