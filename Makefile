@@ -66,6 +66,7 @@ $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 # Compile the BOF4 assembly.
+$(ADIR)/BOF4.s: CFLAGS:=$(CFLAGS) -mfpu=vfpv2
 $(ADIR)/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
 	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
