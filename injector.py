@@ -38,6 +38,9 @@ class RBWriteInjector:
     def inject_ldm(self):
         self.outfile.write('\tLDM code here.\n')
 
+    def inject_func_preamble(self):
+        self.outfile.write('\tFunc preamble here.\n')
+
     def parse_file(self):
         for line in self.infile:
             if line != '\n':
@@ -59,6 +62,10 @@ class RBWriteInjector:
                 elif splitline[0] in RBWriteInjector.ASM_MAIN:
                     self.outfile.write(line)
                     self.inject_setup()
+                elif splitline[0][0] != '.' and splitline[0][-1] == ':':
+                    # Line that ends with colon and does not start with a dot is a function label.
+                    self.outfile.write(line)
+                    self.inject_func_preamble()
                 else:
                     self.outfile.write(line)
 
