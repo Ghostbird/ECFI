@@ -12,7 +12,7 @@ import fileinput
 
 class RBWriteInjector:
     ASM_MAIN = ('main:')
-    ASM_BRANCH = ('b', 'bl', 'bx', 'blx')
+    ASM_BRANCH = ('bx', 'blx')
     ASM_PC = ('pop', 'mov', 'adr', 'adrl')
     ASM_LDR = ('ldr')
     ASM_LDM = ('ldm')
