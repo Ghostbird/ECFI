@@ -89,7 +89,7 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 # Compile CFG from assembly.
-$(CDIR)/%.cfg: CC:=$(CC)-with-$(PYTHON) cfggen.py
+$(CDIR)/%.cfg: CC:=$(CC)-with-$(PYTHON) cfggen.py -flto -flto-partition=none -v
 $(CDIR)/%.cfg: $(CDIR) $(BDIR)/%
 	echo "This is a dummy file." > $@
 

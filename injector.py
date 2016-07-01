@@ -63,7 +63,7 @@ class RBWriteInjector:
                     self.outfile.write(line)
                     self.inject_setup()
                 elif splitline[0][0] != '.' and splitline[0][-1] == ':':
-                    # Line that ends with colon and does not start with a dot is a function label.
+                    # Line that does not start with a dot and yet ends with a colon is a function label.
                     self.outfile.write(line)
                     self.inject_func_preamble()
                 else:
