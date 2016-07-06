@@ -1,7 +1,7 @@
         PUSH    {R5, R6, R8} @note that it only works in Raspberry Pi 1 because of Hardcoded ring buffer address
         LDR     r5, =0xb6fb9010 @ring buffer beginning address
         MOV     r8, r5 @Ring buffer beginning address
-        LDR     r6, =0xb6fb9008 @ringbuffer write offset address
+        SUB     r6, r5, #8  @calculating ringbuffer write offset address. Avoding memory pool
         LDR     r6, [r6]        @load the value of write offset
         ADD     r5, r6          @add the W+Buff
         STMIA   r5!, {r0,r1,r2,FP,LR}   @push the values to the ring buffer and increment the r5 with 20 bytes, Need Hot-site ID here
