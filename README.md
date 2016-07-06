@@ -76,15 +76,25 @@ make cfg/injection-test.cfg
 ```
 At the moment this creates a dummy _src/injection-test.c_ file and creates CFGs for every function compiled in the _cfg_ directory. The functions are in both DOT and SVG format.
 Note: If you want to cross-compile and generate CFGs you'll need the GCC Python plugin for your specific cross compiler. You'll probably have to compile it from source.
+
 ### Python plugin caveat ###
 If you get an error like `cc1: error: fail to initialize plugin...` about the Python plugin, you must build the GCC python plugin exactly for your GCC version.
 
-On Debian based systems:
+You can try to do this by running the make target for the GCC-Python-plugin for example:
 ```bash
-apt-get build-deps gcc-python3-plugin
-apt-get -b source gcc-python3-plugin
-dpkg -i gcc-python3-plugin_<version>_<arch>.deb
+make gcc-6-python3-plugin
 ```
+This will build **and install (system-wide)** the GCC-Python-plugin for GCC 6 and your system's default version of Python 3.
+
+To run the CFG generation for a specific combination of GCC and Python, run:
+```bash
+make -B cfg/<executable name>.cfg CC=<GCC executable> PYTHON=<Python executable> PYTHONPATH=<GCC's plugin directory>/\${PYTHON}
+```
+An example would be:
+```bash
+make -B cfg/injection-test.cfg CC=/usr/local/bin/gcc PYTHON=python PYTHONPATH=/usr/local/lib/gcc/x86_64-pc-linux-gnu/7.0.0/plugin/\${PYTHON}
+```
+This compiles the CFG for src/injection-test.c using a custom built GCC7 compiler at /usr/local/bin/gcc and the corresponding, presumably correctly compiled Python2.7 version of the GCC-Python-plugin.
 
 ## Architecture ##
 Memory layout for ring buffer:
