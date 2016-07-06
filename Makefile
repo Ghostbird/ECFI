@@ -89,13 +89,18 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 # Compile CFG from assembly.
-$(CDIR)/%.cfg: CC:=$(CC)-with-$(PYTHON) cfggen.py -flto -flto-partition=none -v
+$(CDIR)/%.cfg: CFLAGS:=-flto -flto-partition=none -fplugin=$(PYTHON) -fplugin-arg-$(PYTHON)-script=cfggen.py $(CFLAGS)
 $(CDIR)/%.cfg: $(CDIR) $(BDIR)/%
 	echo "This is a dummy file." > $@
 
 $(CDIR):
 	mkdir -p $(CDIR)
 
+# Download and install the gcc python plugin
+$(CC)-$(PYTHON)-plugin:
+	git clone https://git.fedorahosted.org/git/gcc-python-plugin.git $(CC)-$(PYTHON)-plugin
+	cd $(CC)-$(PYTHON)-plugin
+	sudo make clean install PYTHON=$(PYTHON) PYTHON_CONFIG=$(PYTHON)-config CC=$(CC) PLUGIN_NAME=$(PYTHON)
 
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
