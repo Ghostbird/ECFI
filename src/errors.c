@@ -187,7 +187,7 @@ void exec_error_msg(int errornum)
         fprintf(stderr,"OR The filesystem is mounted noexec.\n");
         break;
     case EAGAIN:
-        fprintf(stderr,"Having changed its real UID using one of the set*uid() calls, the caller was—and is now still—above its RLIMIT_NPROC resource limit.\n");
+        fprintf(stderr,"Having changed its real UID using one of the set*uid() calls, the caller was - and is now still - above its RLIMIT_NPROC resource limit.\n");
         break;
     case EFAULT:
         fprintf(stderr,"filename or one of the pointers in the vectors argv or envp points outside your accessible address space.\n");
