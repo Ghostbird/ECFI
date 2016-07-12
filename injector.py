@@ -74,35 +74,40 @@ class RBWriteInjector:
         # Nodes are sorted by basic block start.
         # Just find the first block with node.end <= address
         for node in self.nodes:
-            if address > node.end:
+            if address > node.bb_end:
                     continue
             return node
+    def get_hotsite_address(self):
+        address = self.curinst_offset
+        if self.curfunc_name in self.funcs.keys():
+            address += self.funcs[self.curfunc_name]
+        cfgnode = self.node_from_address(address)
+        return address
 
     def inject_branch(self):
-        self.outfile.write('\t                                           ;  <--- Branch code here.\n')
+        self.outfile.write('\tHotsite: {}                                           ;  <--- Branch code here.\n'.format(self.get_hotsite_address()))
 
     def inject_pc(self):
-        self.outfile.write('\t                                           ;  <--- Mod PC code here.\n')
+        self.outfile.write('\tHotsite: {}                                           ;  <--- Mod PC code here.\n'.format(self.get_hotsite_address()))
 
     def inject_ldr(self):
-        self.outfile.write('\t                                           ;  <--- LDR code here.\n')
-
+        self.outfile.write('\tHotsite: {}                                           ;  <--- LDF code here.\n'.format(self.get_hotsite_address()))
     def inject_ldm(self):
-        self.outfile.write('\t                                           ;  <--- LDM code here.\n')
+        self.outfile.write('\tHotsite: {}                                           ;  <--- LDM code here.\n'.format(self.get_hotsite_address()))
 
     def func_prologue(self, func_name):
         self.curfunc_name = func_name
         self.curinst_offset = 0
         if self.curfunc_name == self.main_func:
-            self.outfile.write('\t                                           ;  <--- Set-up code here.\n')
+            self.outfile.write('\tHotsite: {}                                           ;  <--- Set-up code here.\n'.format(self.get_hotsite_address()))
         else:
-            self.outfile.write('\t                                           ;  <--- Func prologue here.\n')
+            self.outfile.write('\tHotsite: {}                                           ;  <--- Function prologue here.\n'.format(self.get_hotsite_address()))
 
     def func_epilogue(self):
         if self.curfunc_name == self.main_func:
-            self.outfile.write('\t                                           ;  <--- Tear-down code here.\n')
+            self.outfile.write('\tHotsite: {}                                           ;  <--- Tear-down code here.\n'.format(self.get_hotsite_address()))
         else:
-            self.outfile.write('\t                                           ;  <--- Func epilogue here.\n')
+            self.outfile.write('\tHotsite: {}                                           ;  <--- Function epilogue here.\n'.format(self.get_hotsite_address()))
         self.curfunc_name = None
         self.curinst_offset = None
 
@@ -145,7 +150,7 @@ class RBWriteInjector:
                     continue
                 # It is an instruction:
                 # Increment function offset
-                self.curinst_offset += 1
+                self.curinst_offset += self.instruction_offset
                 if splitline[0] in RBWriteInjector.ASM_BRANCH:
                     self.inject_branch()
                 elif splitline[0] in RBWriteInjector.ASM_PC and line.find('pc') > -1:
