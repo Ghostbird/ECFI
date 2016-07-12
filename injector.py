@@ -13,8 +13,6 @@ import fileinput
 import pydot
 import html
 
-cfg = None
-
 class CFGNode():
     """ Comparisons between nodes are only valid if they are constructed from
     a single dot file that depicts a valid CFG.
@@ -182,7 +180,6 @@ def main():
     parser.add_argument('output', help='The file to write to as output, the default is stdout.', nargs='?', type=argparse.FileType('w'), default=sys.stdout)
     args = parser.parse_args()
     sys.stderr.write('The input file is:  {}\nThe dot file is: {}\nThe output file is:   {}\n'.format(args.input.name, args.dot, args.output.name))
-    global cfg
     cfg = pydot.graph_from_dot_file(args.dot)
     injector = RBWriteInjector(args.input, args.output, cfg)
     injector.run()
