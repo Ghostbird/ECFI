@@ -11,7 +11,6 @@ import sys
 import argparse
 import fileinput
 import pydot
-import angr
 import html
 
 cfg = None
