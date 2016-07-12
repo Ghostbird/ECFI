@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <BOF4.h>
+/*#include <BOF4.h>*/
 
 /*#include <asm/ptrace.h>*/
 /*#include <asm/processor.h>*/

@@ -16,7 +16,8 @@ TBDIR=$(BDIR)/$(TDIR)
 # Python version
 # PYTHON=python # Python 2
 PYTHON=python3
-
+# Allow user to override GCC-PYTHON-PLUGIN setting at command line, but use failry good default.
+GCC-PYTHON-PLUGIN=$(PYTHON)
 # Define compilation options for the project.
 
 # Compiler choice.
@@ -66,16 +67,27 @@ $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 # Compile the BOF4 assembly.
-$(ADIR)/BOF4.s: CFLAGS:=$(CFLAGS) -mfpu=vfpv2
+#$(ADIR)/BOF4.s: CFLAGS:=$(CFLAGS) -mfpu=vfpv2
 $(ADIR)/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
 	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 	mv $(notdir $@) $@
 
+# Compile the BOFM assembly
+$(ADIR)/BOFM.s: $(SDIR)/BOFM.c $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ADIR)
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG)-S $< $(LIBS)
+	mv $(notdir $@) $@
+
 # Compile the BOF4 binary which is special.
 $(BDIR)/BOF4: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
-	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -o $@ $< $(DEPS) $(OBJ) $(LIBS)
+
+# Compile the BOFM binary which is special.
+$(BDIR)/BOFM: $(SDIR)/BOFM.c
+	mkdir -p $(BDIR)
+	$(CC) $(DEBUG) -o $@ $<
 
 # Compile assembly from its source file.
 $(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
@@ -89,7 +101,7 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
 # Compile CFG from assembly.
-$(CDIR)/%.cfg: CFLAGS:=-flto -flto-partition=none -fplugin=$(PYTHON) -fplugin-arg-$(PYTHON)-script=cfggen.py $(CFLAGS)
+$(CDIR)/%.cfg: CFLAGS:=-flto -flto-partition=none -fplugin=$(GCC-PYTHON-PLUGIN) -fplugin-arg-$(GCC-PYTHON-PLUGIN)-script=cfggen.py $(CFLAGS)
 $(CDIR)/%.cfg: $(CDIR) $(BDIR)/%
 	echo "This is a dummy file." > $@
 
