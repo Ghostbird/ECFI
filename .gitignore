@@ -8,7 +8,8 @@ __pycache__
 asm
 
 # Generated documentation
-doc
+doc/hmtl
+doc/latex
 
 # Generated CFGs
 cfg
