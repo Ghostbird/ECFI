@@ -12,6 +12,17 @@ import argparse
 import fileinput
 import pydot
 import html
+import inspect
+import os
+
+def get_script_dir():
+    filename = inspect.getframeinfo(inspect.currentframe()).filename
+    return os.path.dirname(os.path.abspath(filename))
+
+def get_icode(filename):
+        with open(os.path.join(get_script_dir(), 'injectioncode', 'pushpopinjectioncode.s'), 'r') as file:
+            return file.read().lower()
+        return None
 
 class CFGNode():
     """ Comparisons between nodes are only valid if they are constructed from
@@ -52,6 +63,7 @@ class RBWriteInjector:
     ASM_PC = () #  ('pop', 'mov', 'adr', 'adrl')
     ASM_LDR = () # ('ldr',)
     ASM_LDM = () # ('ldm',)
+    HOTSITE_MARKER = 'HOTSITEIDHERE'
 
     def __init__(self, infile, outfile, cfg):
         self.infile = infile
@@ -66,7 +78,7 @@ class RBWriteInjector:
         self.instruction_offset = second_inst_addr - first_inst_addr
         # Address of the current function we're in.
         self.curfunc_name = None
-        # Address of the current instruction
+        # Address of the current instruction relative to the currunt function.
         self.curinst_offset = None
         self.main_func = 'main'
 
@@ -78,36 +90,58 @@ class RBWriteInjector:
                     continue
             return node
     def get_hotsite_address(self):
+        # Current instruction offset in function
         address = self.curinst_offset
         if self.curfunc_name in self.funcs.keys():
+            # Add address of function to offset
             address += self.funcs[self.curfunc_name]
-        cfgnode = self.node_from_address(address)
+        # Note: Functions not in the CFG get only the instruction offset.
+        # This can be detected as a CFG violation during execution checking
         return address
 
+    def get_hotsite_str(self):
+        HOTSITE_FORMAT = '#{}'
+        return HOTSITE_FORMAT.format(self.get_hotsite_address())
+
     def inject_branch(self):
-        self.outfile.write('\tHotsite: {}                                           ;  <--- Branch code here.\n'.format(self.get_hotsite_address()))
+        if 'self.icode_branch' not in self.__dict__:
+            self.icode_branch = get_icode('pushpopinjectioncode.s')
+        self.outfile.write(self.icode_branch.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+
 
     def inject_pc(self):
-        self.outfile.write('\tHotsite: {}                                           ;  <--- Mod PC code here.\n'.format(self.get_hotsite_address()))
+        pass #self.outfile.write('\t;Hotsite: {}                                           ;  <--- Mod PC code here.\n'.format(self.get_hotsite_address()))
 
     def inject_ldr(self):
-        self.outfile.write('\tHotsite: {}                                           ;  <--- LDF code here.\n'.format(self.get_hotsite_address()))
+        pass #self.outfile.write('\t;Hotsite: {}                                           ;  <--- LDF code here.\n'.format(self.get_hotsite_address()))
     def inject_ldm(self):
-        self.outfile.write('\tHotsite: {}                                           ;  <--- LDM code here.\n'.format(self.get_hotsite_address()))
+        pass #self.outfile.write('\t;Hotsite: {}                                           ;  <--- LDM code here.\n'.format(self.get_hotsite_address()))
 
     def func_prologue(self, func_name):
+        # Set function name and reset instruction offset in function.
         self.curfunc_name = func_name
         self.curinst_offset = 0
+        # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
-            self.outfile.write('\tHotsite: {}                                           ;  <--- Set-up code here.\n'.format(self.get_hotsite_address()))
+            if 'icode_setup' not in self.__dict__:
+                self.icode_setup = get_icode('pushpopinjectioncode.s')
+            self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         else:
-            self.outfile.write('\tHotsite: {}                                           ;  <--- Function prologue here.\n'.format(self.get_hotsite_address()))
+            if 'icode_func_prologue' not in self.__dict__:
+                self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
+            self.outfile.write(self.icode_func_prologue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
 
     def func_epilogue(self):
+        # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
-            self.outfile.write('\tHotsite: {}                                           ;  <--- Tear-down code here.\n'.format(self.get_hotsite_address()))
+            if 'self.icode_teardown' not in self.__dict__:
+                self.icode_teardown = get_icode('pushpopinjectioncode.s')
+            self.outfile.write(self.icode_teardown.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         else:
-            self.outfile.write('\tHotsite: {}                                           ;  <--- Function epilogue here.\n'.format(self.get_hotsite_address()))
+            if 'self.icode_func_epilogue' not in self.__dict__:
+                self.icode_func_epilogue = get_icode('pushpopinjectioncode.s')
+            self.outfile.write(self.icode_func_epilogue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+        # Erase function name and instruction offset
         self.curfunc_name = None
         self.curinst_offset = None
 
