@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-/*#include <BOF4.h>*/
+//declaring global variables of Ringbuffer
+//#define Base (*(volatile uint8_t*)0xbefff6b88u)
+typedef int (*compare_cb)(int a, int b);
 
-/*#include <asm/ptrace.h>*/
-/*#include <asm/processor.h>*/
-
-
+unsigned int RBase = 0xbefff6b8;
+//int R = 0x00;
+//int W = 0x04;
 void secretfunction(){
     register int ecx2 asm("lr");
     printf("Final LR value in secret function is %p \n", ecx2);
@@ -17,20 +18,34 @@ void secretfunction(){
 }
 void vuln(char *arg)
 {
- //   register int ecx asm("lr");
-//    printf("LR value in vuln() function before calling the gets() is %p \n", ecx);
     char buff[10];
     gets(buff);
-/*struct pt_regs *regs = task_pt_regs(current);*/
-/*asm("movl %%lr, %0;" : "=r" (value) : );*/
     register int ecx2 asm("lr");
     printf("LR value in vuln() function after calling gets is %p \n", ecx2);
 }
+
+int dummya(int a, int b){
+return 5;
+}
+
+int dummyb(int a, int b){
+return 5;
+}
+
+void func1(compare_cb fp){
+
+	return fp(5, 6);
+
+}
+
 int main(int argc, char **argv){
-//    register int ecx3 asm("lr");
-//    printf("LR value before calling vuln() in main() is %p \n", ecx3);
-//    rb_init_writer();
-//    printf("The value of ring buffer read pointer is %p\n", rb_writer_read);
+//    asm("EXTERN Base");
+//    asm("LDR r6, =Base");
+  
+    func1(dummya);
+    printf("base address is %p \n",RBase);
+    register int ecx3 asm("lr");
+    printf("LR value before calling vuln() in main() is %p \n", ecx3);
     vuln(argv[1]);
     register int ecx2 asm("lr");
     printf("LR value after calling vuln() in main() is %p \n", ecx2);

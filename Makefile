@@ -1,7 +1,9 @@
 # Define directories for the project.
 IDIR=include
 ADIR=asm
+ARMCFGDIR=arm-cfg
 BDIR=bin
+CDIR=cfg
 SDIR=src
 DDIR=doc
 ODIR=$(BDIR)/obj
@@ -11,6 +13,11 @@ TDIR=test
 TSDIR=$(SDIR)/$(TDIR)
 TBDIR=$(BDIR)/$(TDIR)
 
+# Python version
+# PYTHON=python # Python 2
+PYTHON=python3
+# Allow user to override GCC-PYTHON-PLUGIN setting at command line, but use failry good default.
+GCC-PYTHON-PLUGIN=$(PYTHON)
 # Define compilation options for the project.
 
 # Compiler choice.
@@ -59,15 +66,33 @@ $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(TBDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-# Compile the BOF4 binary which is special.
-$(BDIR)/BOF4: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
-	mkdir -p $(BDIR)
-	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
-
 # Compile the BOF4 assembly.
+#$(ADIR)/BOF4.s: CFLAGS:=$(CFLAGS) -mfpu=vfpv2
 $(ADIR)/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
 	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	mv $(notdir $@) $@
+
+# Compile the BOFM assembly
+$(ADIR)/BOFM.s: $(SDIR)/BOFM.c $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ADIR)
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG)-S $< $(LIBS)
+	mv $(notdir $@) $@
+
+# Compile the BOF4 binary which is special.
+$(BDIR)/BOF4: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(BDIR)
+	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -o $@ $< $(DEPS) $(OBJ) $(LIBS)
+
+# Compile the BOFM binary which is special.
+$(BDIR)/BOFM: $(SDIR)/BOFM.c
+	mkdir -p $(BDIR)
+	$(CC) $(DEBUG) -o $@ $<
+
+# Compile assembly from its source file.
+$(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ADIR)
+	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 	mv $(notdir $@) $@
 
 # Compile a binary from its source file.
@@ -75,11 +100,19 @@ $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(DEPS) $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-# Compile assembly from its source file.
-$(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
-	mkdir -p $(ADIR)
-	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
-	mv $(notdir $@) $@
+# Compile CFG from assembly.
+$(CDIR)/%.cfg: CFLAGS:=-flto -flto-partition=none -fplugin=$(GCC-PYTHON-PLUGIN) -fplugin-arg-$(GCC-PYTHON-PLUGIN)-script=cfggen.py $(CFLAGS)
+$(CDIR)/%.cfg: $(CDIR) $(BDIR)/%
+	echo "This is a dummy file." > $@
+
+$(CDIR):
+	mkdir -p $(CDIR)
+
+# Download and install the gcc python plugin
+$(CC)-$(PYTHON)-plugin:
+	git clone https://git.fedorahosted.org/git/gcc-python-plugin.git $(CC)-$(PYTHON)-plugin
+	cd $(CC)-$(PYTHON)-plugin
+	sudo make clean install PYTHON=$(PYTHON) PYTHON_CONFIG=$(PYTHON)-config CC=$(CC) PLUGIN_NAME=$(PYTHON)
 
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
@@ -112,4 +145,5 @@ runbof: bin/BOF4 asm/BOF4.s bin/cfi-checker
 # Remove all generated files.
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
-	rm -rf $(DDIR)/html $(DDIR)/latex $(BDIR) $(ADIR) __pycache__
+	rm -rf $(DDIR)/html $(DDIR)/latex $(ADIR) $(BDIR) $(CDIR) __pycache__
+	if [ -d $(ARMCFGDIR) ]; then cd $(ARMCFGDIR); make clean; fi
