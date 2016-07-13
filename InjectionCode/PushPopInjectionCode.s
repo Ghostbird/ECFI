@@ -1,4 +1,6 @@
         PUSH    {R5, R6, R8} @note that it only works in Raspberry Pi 1 because of Hardcoded ring buffer address
+        ADD     R5, PC, #8
+        BLX     R5
         LDR     r5, =0xb6fb9010 @ring buffer beginning address
         LDR     r8, =HOTSITEIDHERE
         SUB     r6, r5, #8  @calculating ringbuffer write offset address. Avoding memory pool
