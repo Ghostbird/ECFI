@@ -1,11 +1,12 @@
         PUSH    {R5, R6, R8} @note that it only works in Raspberry Pi 1 because of Hardcoded ring buffer address
         LDR     r5, =0xb6fb9010 @ring buffer beginning address
-        MOV     r8, r5 @Ring buffer beginning address
-        LDR     r6, =0xb6fb9008 @ringbuffer write offset address
+        LDR     r8, =HOTSITEIDHERE
+        SUB     r6, r5, #8  @calculating ringbuffer write offset address. Avoding memory pool
         LDR     r6, [r6]        @load the value of write offset
         ADD     r5, r6          @add the W+Buff
-        STMIA   r5!, {r0,r1,r2,FP,LR}   @push the values to the ring buffer and increment the r5 with 20 bytes, Need Hot-site ID here
+        STMIA   r5!, {r0,r1,r2,r8,LR}   @push the values to the ring buffer and increment the r5 with 20 bytes, Need Hot-site ID here
         LDR     r6, =0xb6fb940c         @Load the End of buffer address
+        SUB     r8, r6, #1020 @Ring buffer beginning address
         TEQ     r6, r5          @is it end of buffer?, -- Line 4
         MOVEQ   r5, r8          @if yes update the R5   -- Line 5.
         LDR     r6, =0xb6fb9004 @loading address of Read offset -- starting line 6
