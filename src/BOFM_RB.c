@@ -42,7 +42,7 @@ void func1(compare_cb fp){
 int main(int argc, char **argv){
 //    asm("EXTERN Base");
 //    asm("LDR r6, =Base");
-    rb_attach(3);
+    rb_init_writer();
     func1(dummya);
     printf("base address is %p \n",RBase);
     register int ecx3 asm("lr");
