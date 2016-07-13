@@ -21,7 +21,7 @@ def get_script_dir():
 
 def get_icode(filename):
         with open(os.path.join(get_script_dir(), 'injectioncode', 'pushpopinjectioncode.s'), 'r') as file:
-            return file.read().lower()
+            return file.read()
         return None
 
 class CFGNode():
