@@ -125,7 +125,7 @@ class RBWriteInjector:
         if self.curfunc_name == self.main_func:
             if 'icode_setup' not in self.__dict__:
                 self.icode_setup = get_icode('pushpopinjectioncode.s')
-            self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+            #self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         else:
             if 'icode_func_prologue' not in self.__dict__:
                 self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
