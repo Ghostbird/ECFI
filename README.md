@@ -6,7 +6,7 @@ A (non-exhaustive) list of software necessary to build the project
 
 - gcc
 - make
-- gcc-python3-plugin (CFG generation)
+- python3-pydot
 - doxygen (optional, documentation)
 - graphviz (optional, documentation)
 - valgrind (optional, memory usage analysis)
