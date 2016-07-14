@@ -5,7 +5,7 @@
 //#define Base (*(volatile uint8_t*)0xbefff6b88u)
 typedef int (*compare_cb)(int a, int b);
 
-//unsigned int RBase = 0xbefff6b8;
+unsigned int RBase = 0xbefff6b8;
 //int R = 0x00;
 //int W = 0x04;
 void secretfunction(){
@@ -43,11 +43,8 @@ int main(int argc, char **argv){
 //    asm("EXTERN Base");
 //    asm("LDR r6, =Base");
     rb_init_writer();
-    printf("The value of ring buffer read pointer is %p \n", rb_writer_read);
-    printf("The value of ring buffer write pointer is %p \n", rb_writer_write);
-    printf("The value of ring buffer pointer is %p \n", rb_writer_buffer);
-    printf("The value of ring buffer end is %p \n", rb_writer_end);
     func1(dummya);
+    printf("base address is %p \n",RBase);
     register int ecx3 asm("lr");
     printf("LR value before calling vuln() in main() is %p \n", ecx3);
     vuln(argv[1]);
