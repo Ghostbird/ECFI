@@ -13,6 +13,8 @@ int cfi_print(const regval_t data[WRITE_DATACOUNT])
     {
         printf("  0x%04x\n", data[i]);
     }
+    /* Force write to go through, or data may be lost on termination. */
+    fflush(NULL);
     return 0;
 }
 
