@@ -1,0 +1,1 @@
+cmd_/home/ali/enable_pmu/enable_pmu.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/ali/enable_pmu/enable_pmu.ko /home/ali/enable_pmu/enable_pmu.o /home/ali/enable_pmu/enable_pmu.mod.o

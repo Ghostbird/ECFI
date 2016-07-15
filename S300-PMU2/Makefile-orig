@@ -1,0 +1,37 @@
+TARGET = enable_pmu.ko
+
+MDIR = arch/arm/enable_pmu
+
+DRIVER_OBJS =   enable_pmu.o
+
+CURRENT = $(shell uname -r)
+
+# Adjust the KDIR variable to the path to your Linux kernel source
+KDIR = /home/jasona/mnt/kvm/kernel/linux-3.12
+
+PWD = $(shell pwd)
+DEST = /lib/modules/$(CURRENT)/kernel/$(MDIR)
+
+obj-m := enable_pmu.o
+aprofile-objs := $(DRIVER_OBJS)
+
+default:
+	$(MAKE) -C $(KDIR) M=$$PWD
+
+install:
+	@if test -f $(DEST)/$(TARGET).orig; then\
+		echo  "Backup of enable_pmu.ko already exists."; \
+        else \
+		echo  "Creating a backup of enable_pmu.ko."; \
+		mv -v $(DEST)/$(TARGET) $(DEST)/$(TARGET).orig; \
+	fi 
+	su -c "cp $(TARGET) $(DEST) && /sbin/depmod -a"
+
+revert:
+	@echo  "Reverting to the original aprofile.ko."
+	@mv -v $(DEST)/$(TARGET).orig $(DEST)/$(TARGET) 
+
+clean:
+	rm -f *.o enable_pmu.ko .*.cmd .*.flags *.mod.c
+ 
+-include $(KDIR)/Rules.make
