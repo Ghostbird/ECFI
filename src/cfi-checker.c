@@ -17,7 +17,8 @@
 
 void checker(ringbuffer_info_t *rb_info)
 {
-    printf("Checker is running...");
+    printf("Checker is running...\n");
+    fflush(NULL);
     regval_t data[WRITE_DATACOUNT] = {0};
     /* Infinite loop */
     while(1)
