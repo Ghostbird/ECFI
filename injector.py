@@ -129,7 +129,7 @@ class RBWriteInjector:
         else:
             if 'icode_func_prologue' not in self.__dict__:
                 self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
-            self.outfile.write(self.icode_func_prologue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+            #self.outfile.write(self.icode_func_prologue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
 
     def func_epilogue(self):
         # Inject code for main or generic function
