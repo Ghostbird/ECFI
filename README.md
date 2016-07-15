@@ -101,8 +101,8 @@ This compiles the CFG for src/injection-test.c using a custom built GCC7 compile
 To generate CFG using angr, we need both angr and angrutils. Once we installed angr via pip, the angr will return error due to a bug in libcapstone. To fix this problem we must copy the libcapstone.so to the location where the error generated. 
 Once we installed angr, we must install the angrutils. After installation, we must change the visualize.py code of angrutils with newly modified angrutils code which generate CFG dot file instead of PNG files. To generate the dot file we will do the following:
 ```bash
-workon angr
-ipython
+#workon angr
+#ipython
 import angr
 from angrutils import *
 proj = angr.Project("BOFM", load_options={'auto_load_libs':False})
