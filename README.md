@@ -96,6 +96,22 @@ make -B cfg/injection-test.cfg CC=/usr/local/bin/gcc PYTHON=python PYTHONPATH=/u
 ```
 This compiles the CFG for src/injection-test.c using a custom built GCC7 compiler at /usr/local/bin/gcc and the corresponding, presumably correctly compiled Python2.7 version of the GCC-Python-plugin.
 
+
+### Generate Dot File CFG from ANGR ###
+To generate CFG using angr, we need both angr and angrutils. Once we installed angr via pip, the angr will return error due to a bug in libcapstone. To fix this problem we must copy the libcapstone.so to the location where the error generated. 
+Once we installed angr, we must install the angrutils. After installation, we must change the visualize.py code of angrutils with newly modified angrutils code which generate CFG dot file instead of PNG files. To generate the dot file we will do the following:
+```bash
+workon angr
+ipython
+import angr
+from angrutils import *
+proj = angr.Project("BOFM", load_options={'auto_load_libs':False})
+main = proj.loader.main_bin.get_symbol("main")
+start_state = proj.factory.blank_state(addr=main.addr)
+cfg = proj.analyses.CFGAccurate(fail_fast=True, enable_symbolic_back_traversal=True, starts=[main.addr], initial_state=start_state)
+plot_cfg(cfg, "ais3_cfg", asminst=True, remove_imports=True, remove_path_terminator=True)  
+```
+The plot CFG will generate a file named test.dot which is the dot file of the CFG for BOFM binary.  
 ## Architecture ##
 Memory layout for ring buffer:
 
