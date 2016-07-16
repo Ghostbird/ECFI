@@ -4,7 +4,8 @@
         SUB     r6, r5, #8  @calculating ringbuffer write offset address. Avoding memory pool
         LDR     r6, [r6]        @load the value of write offset
         ADD     r5, r6          @add the W+Buff
-        STMIA   r5!, {r0,r1,r2,r8,LR}   @push the values to the ring buffer and increment the r5 with 20 bytes, Need Hot-site ID here
+        LDR     r6,[r6]
+        STMIA   r5!, {r8,r6}   @push the values of dereferenced LR and HOTSITEID(R6) to RB and increment the r5 with 8 bytes
         LDR     r6, =0xb6fba40c         @Load the End of buffer address
         SUB     r8, r6, #1020 @Ring buffer beginning address
         TEQ     r6, r5          @is it end of buffer?, -- Line 4
