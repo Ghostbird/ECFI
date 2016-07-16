@@ -1,7 +1,7 @@
 #include <inttypes.h>
 
 /*! Amount of regval_t entries in a buffer field. */
-#define WRITE_DATACOUNT 8
+#define WRITE_DATACOUNT 5
 
 /*! Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
 Take care that size is not allowed to be so big that it overflows the uint32_t maximum. */
