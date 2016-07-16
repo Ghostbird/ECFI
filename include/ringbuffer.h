@@ -100,11 +100,11 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);
     This operation relies on the fact that the size of the ringbuffer is a multiple of the WRITE_DATACOUNT.
     This is guaranteed by using RB_MEMSIZE to calculate the size of the buffer at creation time.
     If this operation overwrites the read pointer it will increment the read pointer by WRITE_DATACOUNT.
-    \param  data an array of data to write.
+    \param  data an array of data to write of size WRITE_DATACOUNT
     \param  rbptr  A pointer to the ring buffer to write to. CANNOT BE NULL.
     \return The pointer to the data array, NULL if the read failed.
 */
-void rb_write(const regval_t data[8], ringbuffer_t *rbptr);
+void rb_write(ringbuffer_t *rbptr, const regval_t data*);
 
 /*! Attach to an existing ringbuffer from a file descriptor.
     \param  fd The file descriptor of the open shared memory file.
