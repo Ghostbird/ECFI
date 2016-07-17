@@ -348,7 +348,7 @@ char test_write()
         /* Get write index of ringbuffer */
         uint32_t iwrite = rb->write;
         /* Write to ringbuffer */
-        rb_write(testdata, rb_child);
+        rb_write(rb_child, testdata);
         /* Quick check to see whether write did anything. */
         if (iwrite == rb->write)
         {

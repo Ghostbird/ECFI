@@ -59,7 +59,7 @@ int main()
         {
             data[j] = i * j;
         }
-        rb_write(data, rb);
+        rb_write(rb, data);
     }
     printf("Injection-test: Finished.\n");
     fflush(NULL);
