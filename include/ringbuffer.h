@@ -120,4 +120,4 @@ void rb_init_writer();
 /*! Write to buffer after rb_init_writer() has been called once. 
     This is a C function that writes to the buffer in a way closer to
     what the injected assembly will do.*/
-void rb_write_attached(const regval_t data[8]);
+void rb_write_attached(int arg0, int arg1, int arg2, int arg3);

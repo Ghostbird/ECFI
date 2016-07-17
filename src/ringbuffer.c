@@ -265,7 +265,7 @@ void rb_init_writer()
     rb_writer_end = rb_writer_buffer + rb->size;
 }
 
-void rb_write_attached(arg0, arg1, arg2, arg3)
+void rb_write_attached(int arg0, int arg1, int arg2, int arg3)
 {
     regval_t* write_offset = rb_writer_buffer + *rb_writer_write;
     write_offset[0] = arg0;
