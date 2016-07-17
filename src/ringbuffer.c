@@ -208,7 +208,7 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
     return data;
 }
 
-void rb_write(const regval_t data[8], ringbuffer_t *rbptr)
+void rb_write(ringbuffer_t *rbptr, const regval_t *data)
 {
     /* (rbptr + 1) is a pointer to the memory directly behind that used by the struct rbptr.
        That is where the real buffer begins. */

@@ -104,7 +104,7 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);
     \param  rbptr  A pointer to the ring buffer to write to. CANNOT BE NULL.
     \return The pointer to the data array, NULL if the read failed.
 */
-void rb_write(ringbuffer_t *rbptr, const regval_t data*);
+void rb_write(ringbuffer_t *rbptr, const regval_t *data);
 
 /*! Attach to an existing ringbuffer from a file descriptor.
     \param  fd The file descriptor of the open shared memory file.
