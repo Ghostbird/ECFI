@@ -66,19 +66,6 @@ $(TBDIR)/%: $(TSDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(TBDIR)
 	$(CC) $(CFLAGS) -o $@ $< $(OBJ) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 
-# Compile the BOF4 assembly.
-#$(ADIR)/BOF4.s: CFLAGS:=$(CFLAGS) -mfpu=vfpv2
-$(ADIR)/BOF4.s: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
-	mkdir -p $(ADIR)
-	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
-	mv $(notdir $@) $@
-
-# Compile the BOFM assembly
-$(ADIR)/BOFM.s: $(SDIR)/BOFM.c $(DEPS) $(OBJ) $(SHLIB)
-	mkdir -p $(ADIR)
-	$(CC) -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG)-S $< $(LIBS)
-	mv $(notdir $@) $@
-
 # Compile the BOF4 binary which is special.
 $(BDIR)/BOF4: $(SDIR)/BOF4.c $(IDIR)/BOF4.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(BDIR)
@@ -92,7 +79,7 @@ $(BDIR)/BOFM: $(SDIR)/BOFM.c
 # Compile assembly from its source file.
 $(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
-	$(CC) $(CFLAGS) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
+	$(CC)  -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 	mv $(notdir $@) $@
 
 # Compile a binary from its source file.
