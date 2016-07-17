@@ -265,16 +265,19 @@ void rb_init_writer()
     rb_writer_end = rb_writer_buffer + rb->size;
 }
 
-void rb_write_attached(const regval_t data[8])
+void rb_write_attached(arg0, arg1, arg2, arg3)
 {
-    regval_t* r5 = rb_writer_buffer + *rb_writer_write;
-    memcpy((void*)r5, (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
-    r5 += WRITE_DATACOUNT;
+    regval_t* write_offset = rb_writer_buffer + *rb_writer_write;
+    write_offset[0] = arg0;
+    write_offset[1] = arg1;
+    write_offset[2] = arg2;
+    write_offset[3] = arg3;
+    write_offset += WRITE_DATACOUNT;
     /* Wrap linear memory space. */
-    if (r5 == rb_writer_end)
-        r5 = rb_writer_buffer;
+    if (write_offset == rb_writer_end)
+        write_offset = rb_writer_buffer;
     /* Kick forward the read pointer on an overwrite. */
-    if (rb_writer_buffer + *rb_writer_read ==  r5)
-        *rb_writer_read = (uint32_t)(r5 - rb_writer_buffer) + WRITE_DATACOUNT;
-    *rb_writer_write = (uint32_t)(r5 - rb_writer_buffer);
+    if (rb_writer_buffer + *rb_writer_read == write_offset)
+        *rb_writer_read = (uint32_t)(write_offset - rb_writer_buffer) + WRITE_DATACOUNT;
+    *rb_writer_write = (uint32_t)(write_offset - rb_writer_buffer);
 }
