@@ -1,5 +1,6 @@
-        PUSH    {r0, r1}
+        PUSH    {r0, r1, r3}
         LDR R0, HOTSITEID
-        LDR r1, [lr]
-        BL     0xADDRESSofOurFunction
-        POP    {r0, r1}
+        LDR r1, [FORWARDEDGELOCATION]
+        LDR     r3, =rb_write_attached
+        BLX     r3
+        POP    {r0, r1, r3}
