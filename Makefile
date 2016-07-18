@@ -3,6 +3,7 @@ IDIR=include
 ADIR=asm
 ARMCFGDIR=arm-cfg
 BDIR=bin
+ABDIR=$(ADIR)_to_$(BDIR)
 CDIR=cfg
 SDIR=src
 DDIR=doc
@@ -77,10 +78,14 @@ $(BDIR)/BOFM: $(SDIR)/BOFM.c
 	$(CC) $(DEBUG) -o $@ $<
 
 # Compile assembly from its source file.
-$(ADIR)/%.s: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
+$(ADIR)/%.s: $(SDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ADIR)
 	$(CC)  -D_XOPEN_SOURCE=500 -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(DEBUG) -fverbose-asm -S $< $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB)))
 	mv $(notdir $@) $@
+
+$(ABDIR)/%: $(ADIR)/%.s $(DEPS) $(OBJ) $(SHLIB)
+	mkdir -p $(ABDIR)
+	$(CC) $(DEBUG) -o $@ $< $(OBJ) $(LIBS) -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB))) -lrt
 
 # Compile a binary from its source file.
 $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
@@ -94,12 +99,6 @@ $(CDIR)/%.cfg: $(CDIR) $(BDIR)/%
 
 $(CDIR):
 	mkdir -p $(CDIR)
-
-# Download and install the gcc python plugin
-$(CC)-$(PYTHON)-plugin:
-	git clone https://git.fedorahosted.org/git/gcc-python-plugin.git $(CC)-$(PYTHON)-plugin
-	cd $(CC)-$(PYTHON)-plugin
-	sudo make clean install PYTHON=$(PYTHON) PYTHON_CONFIG=$(PYTHON)-config CC=$(CC) PLUGIN_NAME=$(PYTHON)
 
 # Generate the documentation.
 doc: $(IDIR)/*.h $(SDIR)/*.c Doxyfile
