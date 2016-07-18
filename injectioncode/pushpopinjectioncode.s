@@ -17,7 +17,7 @@
         SUBEQ   r8, r8, r6      @calculating the RB address(0xb6fba010) avoiding load from memory pool--Line 6
         ADDEQ   r8, r8, #20     @W+20(size of buff)
         SUBEQ   r8, r5, r8      @r8 now contain r5-buffer+size -- Line 6
-        inf   r6, =0xb6fba004   @ Load the value of the Read offset
+        LDREQ   r6, =0xb6fba004   @ Load the value of the Read offset
         STREQ   r8, [r6]        @ --line 7 and end of line 7 :P
         LDR     r6, =0xb6fba008 @ Load the value of the Write offset
         MOV     r8, r6          @r8 holds rb base - avoid memory access
