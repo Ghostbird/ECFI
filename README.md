@@ -22,6 +22,12 @@ To compile to assembly (for example the BOF4.c file) and then to binary:
 make asm/[name of the file].s
 ```
 
+### Compile to binary ###
+To compile to assembly (for example the BOF4.c file) and then to binary:
+```bash
+make asm_to_bin/[THE-File-Name]
+```
+
 ### Cross compiling
 Override the CC variable on the command line with your cross compiler:
 ```bash
