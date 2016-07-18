@@ -20,7 +20,7 @@ def get_script_dir():
     return os.path.dirname(os.path.abspath(filename))
 
 def get_icode(filename):
-        with open(os.path.join(get_script_dir(), 'injectioncode', 'pushpopinjectioncode.s'), 'r') as file:
+        with open(os.path.join(get_script_dir(), 'injectioncode', filename), 'r') as file:
             return file.read()
         return None
 
@@ -46,6 +46,17 @@ class CFGNode():
         # The final line of the block will look like:
         # 0x10660:	pop	{fp, pc}
         self.bb_end      = int(self.instructions[-1].partition(':')[0], 16)
+        # Address after code has been injected.
+        self.patched_address = 0
+        self.pre_nodes = []
+        self.post_nodes = []
+
+    def binary_repr(self):
+        b = [patched_address]
+        b.add(len(self.pre_nodes))
+        b.exend([pre_node.patched_address for pre_node in self.pre_nodes])
+        b.add(len(self.post_nodes))
+        b.exend([post_node.patched_address for post_node in self.post_nodes])
 
     # Enable sorting of nodes by start address
     # Assume no overlap (see class docstring)
@@ -64,23 +75,39 @@ class RBWriteInjector:
     ASM_LDR = () # ('ldr',)
     ASM_LDM = () # ('ldm',)
     HOTSITE_MARKER = 'HOTSITEIDHERE'
+    FORWARDEDGE_MARKER = 'FORWARDEDGELOCATION'
 
     def __init__(self, infile, outfile, cfg):
         self.infile = infile
         self.outfile = outfile
         self.cfg = cfg
         self.nodes = sorted([CFGNode(node) for node in cfg.get_nodes()])
+        self.edges = cfg.get_edges()
+        self.reverse_node_lookup = {cfgnode.node.obj_dict['name']:cfgnode for cfgnode in self.nodes}
+        for cfgnode in self.nodes:
+            self.add_src_and_dst_to_node(cfgnode)
         self.funcs = {}
         for cfgnode in self.nodes:
             self.funcs[cfgnode.func_name] = cfgnode.func_addr
         first_inst_addr = int(self.nodes[0].instructions[0].partition(':')[0], 16)
         second_inst_addr = int(self.nodes[0].instructions[1].partition(':')[0], 16)
+        # Difference between addresses of two subsequent instructions.
         self.instruction_offset = second_inst_addr - first_inst_addr
         # Address of the current function we're in.
         self.curfunc_name = None
         # Address of the current instruction relative to the currunt function.
-        self.curinst_offset = None
+        self.curfunc_inst_offset = None
+        # Keep track of the offset created by the instructions that have been injected.
+        self.injected_offset = 0;
         self.main_func = 'main'
+
+    def add_src_and_dst_to_node(self, cfgnode):
+        for edge in self.edges:
+            src, dst = edge.obj_dict['points'][0], edge.obj_dict['points'][1]
+            if src == cfgnode.node.obj_dict['name']:
+                cfgnode.pre_nodes.append(self.reverse_node_lookup[dst])
+            elif dst == cfgnode.node.obj_dict['name']:
+                cfgnode.post_nodes.append(self.reverse_node_lookup[src])
 
     def node_from_address(self, address):
         # Nodes are sorted by basic block start.
@@ -89,9 +116,27 @@ class RBWriteInjector:
             if address > node.bb_end:
                     continue
             return node
+
+    def patch_up_to_node(self, curnode):
+        """ Patch all CFGNodes up to the current one, to account for previously injected code.
+        It sets the CFGNode.patched_address to the bb_start address + the injected_offset.
+
+        Call this function just before injecting a new block.
+        It will patch all function since the last injection, and update their bb_start addresses.
+        This can be done like this, because self.nodes is a sorted list.
+        So any node before the PREVIOUS injection will already have been patched,
+        with a lower injected_offset value. And wil not be touched again.
+        """
+        for cfgnode in self.nodes:
+            if cfgnode.patched_address == 0:
+                cfgnode.patched_address = cfgnode.bb_start + self.injected_offset
+            if cfgnode == curnode:
+                break
+
+
     def get_hotsite_address(self):
         # Current instruction offset in function
-        address = self.curinst_offset
+        address = self.curfunc_inst_offset
         if self.curfunc_name in self.funcs.keys():
             # Add address of function to offset
             address += self.funcs[self.curfunc_name]
@@ -103,10 +148,19 @@ class RBWriteInjector:
         HOTSITE_FORMAT = '#{}'
         return HOTSITE_FORMAT.format(self.get_hotsite_address())
 
-    def inject_branch(self):
+    def inject_branch(self, blx_target):
         if 'self.icode_branch' not in self.__dict__:
-            self.icode_branch = get_icode('pushpopinjectioncode.s')
-        self.outfile.write(self.icode_branch.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+            self.icode_branch = get_icode('Call-C-Function-IndirectBranch.s')
+        # Local copy specific to this location
+        local_icode = self.icode_branch
+        # Insert local forward edge address
+        local_icode = local_icode.replace(self.FORWARDEDGE_MARKER, blx_target)
+        # Insert local hotsite ID
+        local_icode = local_icode.replace(self.HOTSITE_MARKER, self.get_hotsite_str())
+        # Add to injected instruction offset
+        self.injected_offset += self.instruction_offset * len(local_icode.split('\n'))
+        # Write to file.
+        self.outfile.write(local_icode)
 
 
     def inject_pc(self):
@@ -120,30 +174,32 @@ class RBWriteInjector:
     def func_prologue(self, func_name):
         # Set function name and reset instruction offset in function.
         self.curfunc_name = func_name
-        self.curinst_offset = 0
+        self.curfunc_inst_offset = 0
         # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
             if 'icode_setup' not in self.__dict__:
-                self.icode_setup = get_icode('pushpopinjectioncode.s')
-            #self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
-        else:
-            if 'icode_func_prologue' not in self.__dict__:
-                self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
+                self.icode_setup = get_icode('dynamicpushpopinjectioncode.s')
+            # Add to the injected instruction offset.
+            self.injected_offset += self.instruction_offset * len(self.icode_setup.split('\n'))
+            self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+        #else:
+            #if 'icode_func_prologue' not in self.__dict__:
+                #self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
             #self.outfile.write(self.icode_func_prologue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
 
     def func_epilogue(self):
         # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
             if 'self.icode_teardown' not in self.__dict__:
-                self.icode_teardown = get_icode('pushpopinjectioncode.s')
+                self.icode_teardown = get_icode('Call-C-Function-Epilogue.s')
             self.outfile.write(self.icode_teardown.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         else:
             if 'self.icode_func_epilogue' not in self.__dict__:
-                self.icode_func_epilogue = get_icode('pushpopinjectioncode.s')
+                self.icode_func_epilogue = get_icode('Call-C-Function-Epilogue.s')
             self.outfile.write(self.icode_func_epilogue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         # Erase function name and instruction offset
         self.curfunc_name = None
-        self.curinst_offset = None
+        self.curfunc_inst_offset = None
 
     def parse_file(self):
         """ Parse an assembly file and inject CFI lines.
@@ -184,9 +240,9 @@ class RBWriteInjector:
                     continue
                 # It is an instruction:
                 # Increment function offset
-                self.curinst_offset += self.instruction_offset
+                self.curfunc_inst_offset += self.instruction_offset
                 if splitline[0] in RBWriteInjector.ASM_BRANCH:
-                    self.inject_branch()
+                    self.inject_branch(splitline[1])
                 elif splitline[0] in RBWriteInjector.ASM_PC and line.find('pc') > -1:
                         self.inject_pc()
                 elif splitline[0] in RBWriteInjector.ASM_LDR and line.find('pc') > -1:
@@ -211,6 +267,11 @@ class RBWriteInjector:
 
     def run(self):
         self.parse_file()
+
+    def write_binary_cfg(self):
+        with open('{}_cfg.bin', os.path.splitext(self.outfile.name)[0]):
+            pass
+
 
 def main():
     parser = argparse.ArgumentParser(description='Inject code to allow control flow integrity (CFI) checking into a program\'s assembly, based on the program\'s control flow graph(CFG)')
