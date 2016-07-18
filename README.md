@@ -19,8 +19,7 @@ make
 ### Compile to assembly ###
 To compile to assembly (for example the BOF4.c file) and then to binary:
 ```bash
-make asm/BOF4.s
-gcc -lrt bin/lib/libringbuffer.so bin/obj/errors.o asm/BOF4.s
+make asm/[name of the file].s
 ```
 
 ### Cross compiling
@@ -51,7 +50,7 @@ LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test
 
 To compile and test the BOF4 executable:
 ```bash
-make -B all
+make asm_to_bin/[filename]
 LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/BOF4
 ```
 
