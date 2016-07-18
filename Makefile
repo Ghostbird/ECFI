@@ -131,5 +131,5 @@ runbof: bin/BOF4 asm/BOF4.s bin/cfi-checker
 # Remove all generated files.
 clean:
 	rm -f *~ $(IDIR)/*~ $(SDIR)/*~ $(TSDIR)/*~
-	rm -rf $(DDIR)/html $(DDIR)/latex $(ADIR) $(BDIR) $(CDIR) __pycache__
+	rm -rf $(DDIR)/html $(DDIR)/latex $(ADIR) $(ABDIR) $(BDIR) $(CDIR) __pycache__
 	if [ -d $(ARMCFGDIR) ]; then cd $(ARMCFGDIR); make clean; fi
