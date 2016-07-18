@@ -40,13 +40,13 @@ To compile and test the ringbuffer library:
 make runtests
 ```
 To test the record write/verify functionality:
+
 1. Open src/cfi-checker.c
 2. Comment lines 28 and 30. (cfi_print and cfi_check_record)
 3. Uncomment line 29 (cfi_record)
-4. Compile and run once.```bash
-make -B bin/cfi-checker bin/injection-test
-LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test
-```
+4. Compile and run once:
+    <pre><code>make -B bin/cfi-checker bin/injection-test
+    LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/injection-test</code></pre>
 5. Open src/cfi-checker.c again.
 6. Comment line 29 (cfi_record)
 7. Uncomment line 30 (cfi_check_record)
