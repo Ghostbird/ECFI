@@ -85,7 +85,7 @@ $(ADIR)/%.s: $(SDIR)/%.c $(DEPS) $(OBJ) $(SHLIB)
 
 $(ABDIR)/%: $(ADIR)/%.s $(DEPS) $(OBJ) $(SHLIB)
 	mkdir -p $(ABDIR)
-	$(CC) $(DEBUG) -o $@ $< $(OBJ) $(LIBS) -I$(IDIR) -L$(LDIR) -L$(SHLIBDIR) $(LIBS) $(patsubst %,-l%,$(notdir $(_SHLIB))) -lrt
+	$(CC) $(DEBUG) -o $@ $< -L$(LDIR) -L$(SHLIBDIR) -lrt
 
 # Compile a binary from its source file.
 $(BDIR)/%: $(SDIR)/%.c $(IDIR)/%.h $(DEPS) $(OBJ) $(SHLIB)
