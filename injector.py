@@ -145,7 +145,7 @@ class RBWriteInjector:
         return address
 
     def get_hotsite_str(self):
-        HOTSITE_FORMAT = '#{}'
+        HOTSITE_FORMAT = '{}'
         return HOTSITE_FORMAT.format(self.get_hotsite_address())
 
     def inject_branch(self, blx_target):
