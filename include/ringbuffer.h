@@ -1,7 +1,7 @@
 #include <inttypes.h>
 
 /*! Amount of regval_t entries in a buffer field. */
-#define WRITE_DATACOUNT 5
+#define WRITE_DATACOUNT 2
 
 /*! Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
 Take care that size is not allowed to be so big that it overflows the uint32_t maximum. */
@@ -118,6 +118,6 @@ ringbuffer_t *rb_attach(int fd);
 void rb_init_writer();
 
 /*! Write to buffer after rb_init_writer() has been called once. 
-    This is a C function that writes to the buffer in a way closer to
-    what the injected assembly will do.*/
-void rb_write_attached(int arg0, int arg1, int arg2, int arg3);
+    This is a C function that can be branched to from assembly
+    to write to the ringbuffer directly */
+void rb_write_attached(int arg0, int arg1);
