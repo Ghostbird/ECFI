@@ -311,7 +311,7 @@ char test_read()
 char test_write()
 {
     /* Flush to prevent stdout and stderr to desynchronise between test cases. */
-    const regval_t testdata[WRITE_DATACOUNT] = {5, 12, 1337, 8430, 123};
+    const regval_t testdata[WRITE_DATACOUNT] = {5, 12};
     fflush(NULL);
     const uint32_t bufsize = 1024;
     char success = TRUE;
