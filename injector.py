@@ -15,6 +15,9 @@ import html
 import inspect
 import os
 
+BYTEORDER='little'
+#BYTEORDER='big'
+
 def get_script_dir():
     filename = inspect.getframeinfo(inspect.currentframe()).filename
     return os.path.dirname(os.path.abspath(filename))
@@ -51,13 +54,13 @@ class CFGNode():
         self.pre_nodes = []
         self.post_nodes = []
 
-    def binary_repr(self):
-        b = [patched_address]
-        b.add(len(self.pre_nodes))
-        b.exend([pre_node.patched_address for pre_node in self.pre_nodes])
-        b.add(len(self.post_nodes))
-        b.exend([post_node.patched_address for post_node in self.post_nodes])
-
+    def numbers_repr(self):
+        n = [self.patched_address]
+        n.append(len(self.pre_nodes))
+        n.extend([pre_node.patched_address for pre_node in self.pre_nodes])
+        n.append(len(self.post_nodes))
+        n.extend([post_node.patched_address for post_node in self.post_nodes])
+        return n
     # Enable sorting of nodes by start address
     # Assume no overlap (see class docstring)
     def __eq__(self, cfgnode):
@@ -148,7 +151,19 @@ class RBWriteInjector:
         HOTSITE_FORMAT = '{}'
         return HOTSITE_FORMAT.format(self.get_hotsite_address())
 
+    def patch_upto_here(self):
+        """ Set Node.patched_address for all nodes up-to-and-including this one,
+            based on previously injected code.
+        """
+        if not self.curfunc_name in self.funcs:
+            # Don't patch for functions not in CFG.
+            return
+        curfunc_address = self.funcs[self.curfunc_name]
+        curnode = self.node_from_address(curfunc_address + self.curfunc_inst_offset)
+        self.patch_up_to_node(curnode)
+
     def inject_branch(self, blx_target):
+        self.patch_upto_here()
         if 'self.icode_branch' not in self.__dict__:
             self.icode_branch = get_icode('Call-C-Function-IndirectBranch.s')
         # Local copy specific to this location
@@ -164,30 +179,35 @@ class RBWriteInjector:
 
 
     def inject_pc(self):
+        self.patch_upto_here()
         pass #self.outfile.write('\t;Hotsite: {}                                           ;  <--- Mod PC code here.\n'.format(self.get_hotsite_address()))
 
     def inject_ldr(self):
+        self.patch_upto_here()
         pass #self.outfile.write('\t;Hotsite: {}                                           ;  <--- LDF code here.\n'.format(self.get_hotsite_address()))
     def inject_ldm(self):
+        self.patch_upto_here()
         pass #self.outfile.write('\t;Hotsite: {}                                           ;  <--- LDM code here.\n'.format(self.get_hotsite_address()))
 
     def func_prologue(self, func_name):
         # Set function name and reset instruction offset in function.
         self.curfunc_name = func_name
         self.curfunc_inst_offset = 0
+        #self.patch_upto_here()
         # Inject code for main or generic function
-        if self.curfunc_name == self.main_func:
-            if 'icode_setup' not in self.__dict__:
-                self.icode_setup = get_icode('dynamicpushpopinjectioncode.s')
+        #if self.curfunc_name == self.main_func:
+            #if 'icode_setup' not in self.__dict__:
+                #self.icode_setup = get_icode('dynamicpushpopinjectioncode.s')
             # Add to the injected instruction offset.
-            self.injected_offset += self.instruction_offset * len(self.icode_setup.split('\n'))
-            self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+            #self.injected_offset += self.instruction_offset * len(self.icode_setup.split('\n'))
+            #self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         #else:
             #if 'icode_func_prologue' not in self.__dict__:
                 #self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
             #self.outfile.write(self.icode_func_prologue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
 
     def func_epilogue(self):
+        self.patch_upto_here()
         # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
             if 'self.icode_teardown' not in self.__dict__:
@@ -269,9 +289,20 @@ class RBWriteInjector:
         self.parse_file()
 
     def write_binary_cfg(self):
-        with open('{}_cfg.bin', os.path.splitext(self.outfile.name)[0]):
-            pass
-
+        data = [len(self.nodes)]
+        for node in self.nodes:
+            data.extend(node.numbers_repr())
+        try:
+            os.mkdir('cfg')
+        except FileExistsError:
+            pass # Assume it is a directory.
+        with open('{}.txt'.format(os.path.join('cfg',os.path.splitext(os.path.basename(self.infile.name))[0])), 'w') as txtcfg:
+            strdata = [str(value) for value in data]
+            txtcfg.write(', '.join(strdata))
+            txtcfg.write('\n')
+        with open('{}.bin'.format(os.path.join('cfg',os.path.splitext(os.path.basename(self.infile.name))[0])), 'wb') as bincfg:
+            for value in data:
+                bincfg.write(value.to_bytes(4,byteorder=BYTEORDER, signed=False))
 
 def main():
     parser = argparse.ArgumentParser(description='Inject code to allow control flow integrity (CFI) checking into a program\'s assembly, based on the program\'s control flow graph(CFG)')
@@ -286,8 +317,8 @@ def main():
         cfg = cfg[0]
     injector = RBWriteInjector(args.input, args.output, cfg)
     injector.run()
+    injector.write_binary_cfg()
     args.output.close()
     args.input.close()
-
 if __name__ == '__main__':
     main()
