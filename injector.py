@@ -281,6 +281,9 @@ def main():
     args = parser.parse_args()
     sys.stderr.write('The input file is:  {}\nThe dot file is: {}\nThe output file is:   {}\n'.format(args.input.name, args.dot, args.output.name))
     cfg = pydot.graph_from_dot_file(args.dot)
+    # newer pydot version always returns list.
+    if issinstance(cfg, list):
+        cfg = cfg[0]
     injector = RBWriteInjector(args.input, args.output, cfg)
     injector.run()
     args.output.close()
