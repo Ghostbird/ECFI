@@ -214,7 +214,7 @@ class RBWriteInjector:
             line = lines[line_nr]
             # Skip GCC generated preamble
             splitline = line.split()
-            if len(splitline) > 0 and not splitline[0].startswith('.') and not splitline[0].startswith('.'):
+            if len(splitline) > 0 and not splitline[0].startswith('.') and not splitline[0].startswith('.') and not splitline[0].startswith('@'):
                 # Only act on lines that contain an instruction or function label.
                 if  splitline[0][-1] == ':' and line_nr + 1 < len(lines):
                     if not lines[line_nr + 1].strip().startswith('@'):
