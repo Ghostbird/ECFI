@@ -63,8 +63,7 @@ LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker bin/BOF4
 ## Debugging
 To load the cfi-checker injection test in gdb, with debug symbols:
 ```bash
-make -B debug 
-LD_PRELOAD=bin/lib/libringbuffer.so gdb --args bin/cfi-checker bin/injection-test
+./gdb.sh asm_to_bin/Filename
 ```
 To end up in the right process, you may have to `set follow-fork-mode child` at an appropriate point in gdb.
 
