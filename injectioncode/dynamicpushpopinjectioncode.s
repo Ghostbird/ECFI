@@ -14,6 +14,7 @@
         MOVEQ   r5, r8          @if yes update the R5   -- Line 5.
         LDR     r6, =[rb_writer_read] @loading address of Read offset -- starting line 6
         LDR     r6, [r6]        @Load the value of Read offset -- Line 6
+        LDR     r6, [r6]        @extra dereference missed here
         ADD     r8,r6, r8       @ rb_addr+r and store it in r8. Needs opti, run without res of TEQ --Line 6
         TEQ     r5, r8  @if buffer+r = r5 then -- Line 6
         SUBEQ   r8, r8, r6 @calculating the RB addr avoiding load from memory pool--Line 6
