@@ -35,7 +35,7 @@ _TESTS=ringbuffer read-speed
 TESTS=$(patsubst %,$(TBDIR)/%,$(_TESTS))
 
 # Define the dependencies.
-_DEPS=ringbuffer.h errors.h cfi-heuristics.h
+_DEPS=ringbuffer.h errors.h cfi-heuristics.h cfg.h
 DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Define the object files to compile.
