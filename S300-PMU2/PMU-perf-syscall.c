@@ -27,6 +27,7 @@
        memset(&pe, 0, sizeof(struct perf_event_attr));
        pe.type = PERF_TYPE_HARDWARE;
        pe.size = sizeof(struct perf_event_attr);
+// Here I count CPU Instructions. In Case you want to calculate the CPU Cycles use the commented code. And look at perf_event_open manpage.
 //       pe.config = PERF_COUNT_HW_INSTRUCTIONS;
 //       pe.config = PERF_COUNT_HW_CPU_CYCLES;
        pe.config = PERF_COUNT_HW_BRANCH_INSTRUCTIONS;
