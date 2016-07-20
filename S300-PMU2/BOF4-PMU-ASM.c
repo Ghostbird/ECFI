@@ -1,3 +1,5 @@
+// BEFORE RUNNING THIS CODE PLEASE INSERT THE CRASH1 Kernel Module to Enable PMU Access.
+
 #include <stdio.h>
 #include <asm/ptrace.h>
 /*#include <asm/processor.h>*/
