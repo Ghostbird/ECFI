@@ -15,6 +15,9 @@ import html
 import inspect
 import os
 
+class InjectorError(Exception):
+    pass
+
 BYTEORDER='little'
 #BYTEORDER='big'
 
@@ -26,6 +29,11 @@ def get_icode(filename):
         with open(os.path.join(get_script_dir(), 'injectioncode', filename), 'r') as file:
             return file.read()
         return None
+
+def to_bytes(integer):
+    if not isinstance(integer, int):
+        raise InjectorException('This method only accepts integers')
+    return integer.to_bytes(4,byteorder=BYTEORDER, signed=False)
 
 class CFGNode():
     """ Comparisons between nodes are only valid if they are constructed from
@@ -54,12 +62,14 @@ class CFGNode():
         self.pre_nodes = []
         self.post_nodes = []
 
-    def numbers_repr(self):
-        n = [self.patched_address]
-        n.append(len(self.pre_nodes))
-        n.extend([pre_node.patched_address for pre_node in self.pre_nodes])
-        n.append(len(self.post_nodes))
-        n.extend([post_node.patched_address for post_node in self.post_nodes])
+    def byte_repr(self):
+        n = [to_bytes(self.patched_address)]
+        pre_nodes = [to_bytes(node.patched_address) for node in self.pre_nodes]
+        post_nodes = [to_bytes(node.patched_address) for node in self.post_nodes]
+        n.append(to_bytes(len(pre_nodes)))
+        n.extend(pre_nodes)
+        n.append(to_bytes(len(post_nodes)))
+        n.extend(post_nodes)
         return n
     # Enable sorting of nodes by start address
     # Assume no overlap (see class docstring)
@@ -133,8 +143,8 @@ class RBWriteInjector:
         for cfgnode in self.nodes:
             if cfgnode.patched_address == 0:
                 cfgnode.patched_address = cfgnode.bb_start + self.injected_offset
-            if cfgnode == curnode:
-                break
+                if cfgnode == curnode:
+                    break
 
 
     def get_hotsite_address(self):
@@ -289,20 +299,17 @@ class RBWriteInjector:
         self.parse_file()
 
     def write_binary_cfg(self):
-        data = [len(self.nodes)]
+        data = [to_bytes(len(self.nodes))]
         for node in self.nodes:
-            data.extend(node.numbers_repr())
+            data.extend(node.byte_repr())
         try:
             os.mkdir('cfg')
         except FileExistsError:
             pass # Assume it is a directory.
-        with open('{}.txt'.format(os.path.join('cfg',os.path.splitext(os.path.basename(self.infile.name))[0])), 'w') as txtcfg:
-            strdata = [str(value) for value in data]
-            txtcfg.write(', '.join(strdata))
-            txtcfg.write('\n')
+        # Create and open binary CFG file.
         with open('{}.bin'.format(os.path.join('cfg',os.path.splitext(os.path.basename(self.infile.name))[0])), 'wb') as bincfg:
             for value in data:
-                bincfg.write(value.to_bytes(4,byteorder=BYTEORDER, signed=False))
+                bincfg.write(value)
 
 def main():
     parser = argparse.ArgumentParser(description='Inject code to allow control flow integrity (CFI) checking into a program\'s assembly, based on the program\'s control flow graph(CFG)')
