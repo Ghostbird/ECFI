@@ -6,7 +6,7 @@
 
 #define RECORDNAME "record"
 
-int cfi_print(const regval_t data[WRITE_DATACOUNT])
+int cfi_print(const regval_t *data)
 {
     printf("Read: \n");
     for (int i = 0; i < WRITE_DATACOUNT; i++)
@@ -19,7 +19,7 @@ int cfi_print(const regval_t data[WRITE_DATACOUNT])
 }
 
 
-int cfi_record(const regval_t data[WRITE_DATACOUNT])
+int cfi_record(const regval_t *data)
 {
     FILE *record;
     static unsigned char reset_once = 1;
@@ -55,7 +55,7 @@ int cfi_record(const regval_t data[WRITE_DATACOUNT])
     return 0;
 }
 
-int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
+int cfi_check_record(const regval_t *data)
 {
     /* Keep track of the number of times this function is called. */
     static uint32_t step = 0;
@@ -92,14 +92,8 @@ int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
         {
             fprintf(stdout, "Original record, and current program run are not identical in step %d:\n", step);
             fprintf(stdout, "        Original            Current\n");
-            fprintf(stdout, "LR: %016x    %016x\n", buffer[0], data[0]);
-            fprintf(stdout, "PC: %016x    %016x\n", buffer[1], data[1]);
-            fprintf(stdout, "SP: %016x    %016x\n", buffer[2], data[2]);
-            fprintf(stdout, "FP: %016x    %016x\n", buffer[3], data[3]);
-            fprintf(stdout, "R1: %016x    %016x\n", buffer[4], data[4]);
-            fprintf(stdout, "R2: %016x    %016x\n", buffer[5], data[5]);
-            fprintf(stdout, "R3: %016x    %016x\n", buffer[6], data[6]);
-            fprintf(stdout, "R4: %016x    %016x\n", buffer[7], data[7]);
+            fprintf(stdout, "Hotsite: %016x    %016x\n", buffer[0], data[0]);
+            fprintf(stdout, "Target:  %016x    %016x\n", buffer[1], data[1]);
         }
     }
     if (fclose(record) != 0)
@@ -109,4 +103,14 @@ int cfi_check_record(const regval_t data[WRITE_DATACOUNT])
     }
     step += 1;
     return 0;
+}
+
+/* Return 0 on success, 1 on invalid edge, -1 on error. */
+int cfi_validate_forward_edge(const regval_t *data, const cfg_t *cfg)
+{
+    if (cfg_validate_jump(cfg, data[0], data[1]) == 0)
+    {
+        return 0;
+    }
+    return 1;
 }

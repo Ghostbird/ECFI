@@ -39,7 +39,7 @@ _DEPS=ringbuffer.h errors.h cfi-heuristics.h cfg.h
 DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Define the object files to compile.
-_OBJ=errors cfi-heuristics
+_OBJ=errors cfi-heuristics cfg
 OBJ=$(patsubst %,$(ODIR)/%.o,$(_OBJ))
 
 # Define the shared object libraries to compile.

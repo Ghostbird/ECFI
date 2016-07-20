@@ -15,7 +15,7 @@
 
 #define RB_PREFIX "rb_cfi_"
 
-void checker(ringbuffer_info_t *rb_info)
+void checker(ringbuffer_info_t *rb_info, cfg_t *cfg)
 {
     printf("Checker is running...\n");
     fflush(NULL);
@@ -29,6 +29,10 @@ void checker(ringbuffer_info_t *rb_info)
             //cfi_print(data);
             //cfi_record(data);
             cfi_check_record(data);
+            if (cfg != NULL)
+            {
+                cfi_validate_forward_edge(data, cfg);
+            }
         }
     sched_yield();
     }
@@ -43,13 +47,13 @@ int main(int argc, char *argv[])
         printf(" %i: %s\n", i, argv[i]);
     }
     /* No arguments are supplied. We need at least one.*/
-    if (argc == 1)
+    if (argc < 2)
     {
         /* Print usage hint and exit. */
         fprintf(stderr, "USAGE: %s <program to run + arguments>\n",argv[0]);
         exit(EXIT_FAILURE);
     }
-    /* Allocate space to make a nice name for the ringbuffer.*/
+    /* Name for the ringbuffer.*/
     char* basename;
     if (index(argv[1], '/') == NULL)
     {
@@ -95,13 +99,23 @@ int main(int argc, char *argv[])
     else if (checker_pid == 0)
     {
         printf("Checker: Starting...\n");
+        cfg_t *cfg;
+        if (argc == 3)
+        {
+            cfg = cfg_create(argv[2]);
+            if (cfg == NULL)
+            {
+                fprintf(stderr, "Checker: Failed to create CFG from %s", argv[2]);
+                exit(EXIT_FAILURE);
+            }
+        }
         fflush(NULL);
         /* We'll lose connection to the shell when the parent process exits.
            Redirect stdout and stderr to logs. */
         freopen("checker.out","w",stdout);
         freopen("checker.err","w",stderr);
         /* Start the checker. */
-        checker(rb_info);
+        checker(rb_info, cfg);
         /* Unreachable code. Checker does not return, it is terminated. */
         fprintf(stderr, "Checker: Impossible, checker() should not return. Abort.");
         exit(EXIT_FAILURE);

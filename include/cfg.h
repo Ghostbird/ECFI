@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#define CFG_INCLUDE_ONCE
 
 typedef uint32_t cfg_int;
 
@@ -21,3 +22,9 @@ struct cfg
 };
 
 typedef struct cfg cfg_t;
+
+cfg_t *cfg_create(char *path);
+
+void cfg_destroy(cfg_t *cfg);
+
+char cfg_validate_jump(const cfg_t *cfg, const cfg_int hotsite, const cfg_int target);

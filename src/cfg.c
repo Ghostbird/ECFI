@@ -3,7 +3,6 @@
 #include <errno.h> /* errno */
 #include <stdio.h> /* fprintf and stderr */
 #include <stdlib.h> /* malloc and free */
-#include <stdbool.h> /* TRUE and FALSE */
 
 cfg_t *cfg_create(char* path)
 {
@@ -73,7 +72,7 @@ void cfg_destroy(cfg_t *cfg)
     return;
 }
 
-char cfg_validate_jump(cfg_t *cfg, cfg_int hotsite, cfg_int target)
+char cfg_validate_jump(const cfg_t *cfg, const cfg_int hotsite, const cfg_int target)
 {
     // Store cfg block index for hotsite.
     int bblock = 0;
@@ -94,9 +93,9 @@ char cfg_validate_jump(cfg_t *cfg, cfg_int hotsite, cfg_int target)
         if (cfg->data[bblock]->post_data[i] == target)
         {
             fprintf(stderr, "Found valid edge %x -> %x.", hotsite, target);
-            return true;
+            return 1;
         }
     }
     fprintf(stderr, "Could not validate edge %x -> %x.", hotsite, target);
-    return false;
+    return 0;
 }
