@@ -90,7 +90,7 @@ MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Enabling PMU access from user mode");
 ```
 
-We then make a make file as follow:
+We then make a Makefile as follow:
 
 ``` 
 ifeq ($(KERNELRELEASE),)
