@@ -16,7 +16,7 @@
         ADD     r2,r1, r2       @ rb_addr+r and store it in r2. Needs opti, run without res of TEQ --Line 6        
         TEQ     r0, r2  @if buffer+r = r0 then -- Line 6
         SUBEQ   r2, r2, r1 @calculating the RB addr avoiding load from memory pool--Line 6
-        ADDEQ   r2, r2, #8 @W+20(size of buff)
+        ADDEQ   r2, r2, #8 @W+8(size of buff)
         SUBEQ   r2, r0, r2 @r2 now contain r0-buffer+size -- Line 6
         SUBEQ   r1, r3, #12 @ Load the value of the Read offset
         STREQ   r2, [r1]  @ --line 7 and end of line 7 :P
