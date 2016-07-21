@@ -175,7 +175,7 @@ class RBWriteInjector:
     def inject_branch(self, blx_target):
         self.patch_upto_here()
         if 'self.icode_branch' not in self.__dict__:
-            self.icode_branch = get_icode('Call-C-Function-IndirectBranch.s')
+            self.icode_branch = get_icode('dynamicpushpopinjectioncode.s')
         # Local copy specific to this location
         local_icode = self.icode_branch
         # Insert local forward edge address
@@ -221,11 +221,11 @@ class RBWriteInjector:
         # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
             if 'self.icode_teardown' not in self.__dict__:
-                self.icode_teardown = get_icode('Call-C-Function-Epilogue.s')
+                self.icode_teardown = get_icode('dynamicpushpopinjectioncodeEpilogue.s')
             self.outfile.write(self.icode_teardown.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         else:
             if 'self.icode_func_epilogue' not in self.__dict__:
-                self.icode_func_epilogue = get_icode('Call-C-Function-Epilogue.s')
+                self.icode_func_epilogue = get_icode('dynamicpushpopinjectioncodeEpilogue.s')
             self.outfile.write(self.icode_func_epilogue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         # Erase function name and instruction offset
         self.curfunc_name = None
