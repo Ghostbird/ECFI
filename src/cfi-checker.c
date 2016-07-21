@@ -17,9 +17,13 @@
 
 void checker(ringbuffer_info_t *rb_info, cfg_t *cfg)
 {
-    printf("Checker is running...\n");
-    fflush(NULL);
+    fprintf(stderr, "Checker is running...\n");
     regval_t data[WRITE_DATACOUNT] = {0};
+    if (cfg == NULL)
+    {
+        fprintf(stderr, "No CFG data, no CFG checks will be performed.");
+    }
+    fflush(NULL);
     /* Infinite loop */
     while(1)
     {
@@ -34,7 +38,7 @@ void checker(ringbuffer_info_t *rb_info, cfg_t *cfg)
                 cfi_validate_forward_edge(data, cfg);
             }
         }
-    sched_yield();
+        sched_yield();
     }
 }
 

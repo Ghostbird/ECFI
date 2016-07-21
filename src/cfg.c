@@ -93,9 +93,11 @@ char cfg_validate_jump(const cfg_t *cfg, const cfg_int hotsite, const cfg_int ta
         if (cfg->data[bblock]->post_data[i] == target)
         {
             fprintf(stderr, "Found valid edge %x -> %x.", hotsite, target);
+            fflush(stderr);
             return 1;
         }
     }
     fprintf(stderr, "Could not validate edge %x -> %x.", hotsite, target);
+    fflush(stderr);
     return 0;
 }
