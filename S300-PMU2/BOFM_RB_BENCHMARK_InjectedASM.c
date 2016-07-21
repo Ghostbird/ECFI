@@ -6,13 +6,8 @@
 #include <sys/ioctl.h>
 #include <linux/perf_event.h>
 #include <asm/unistd.h>
-//declaring global variables of Ringbuffer
-//#define Base (*(volatile uint8_t*)0xbefff6b88u)
-typedef int (*compare_cb)(int a, int b);
 
-//unsigned int RBase = 0xbefff6b8;
-//int R = 0x00;
-//int W = 0x04;
+typedef int (*compare_cb)(int a, int b);
 
 
 static long perf_event_open(struct perf_event_attr *hw_event, pid_t pid, int cpu, int group_fd, unsigned long flags)
@@ -140,8 +135,6 @@ func1(compare_cb fp){
 }
 
 int main(int argc, char **argv){
-//    asm("EXTERN Base");
-//    asm("LDR r6, =Base");
     rb_init_writer();
     printf("The value of ring buffer read pointer is %p \n", rb_writer_read);
     printf("The value of ring buffer write pointer is %p \n", rb_writer_write);
