@@ -1,6 +1,6 @@
 # S300-PMU2: Accessing ARM SoCs Performance Monitoring Unit(PMU) - User/Kernel Mode
 
-S300-PMU2 is a sophisticated russian surface-to-air missle to protect an airspace from cruise and ballistic missles.  
+S300-PMU2 is a sophisticated Russian surface-to-air missle to protect an airspace from cruise and ballistic missles.  
 We name this component of the ECFI S300-PMU2, since it protects the ring buffer of RTOS from malicious overwrites. It can also calculate the Branches, Returns and CPU cycle.
 
 ##Using PMU for calculating CPU cycles of injectioncode
