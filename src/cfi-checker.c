@@ -1,4 +1,4 @@
-#include "ringbuffer.h"     /* The ring buffer */
+#include "cfi-checker.h"    /* Own header */
 #include <stdio.h>          /* printf(), fprintf(), sprintf() */
 #include <fcntl.h>          /* fcntl() */
 #include <stdlib.h>         /* stderr, exit() and macros */
@@ -42,7 +42,7 @@ void checker(ringbuffer_info_t *rb_info, cfg_t *cfg)
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     /* It's nice for debugging to echo the input. Remove later. */
     printf("Got arguments:\n");

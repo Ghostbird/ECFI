@@ -59,15 +59,16 @@ class CFGNode():
         self.bb_end      = int(self.instructions[-1].partition(':')[0], 16)
         # Address after code has been injected.
         self.patched_address = 0
+        self.hotsiteid = None
         self.pre_nodes = []
         self.post_nodes = []
 
     def byte_repr(self):
         n = [to_bytes(self.patched_address)]
         pre_nodes = [to_bytes(node.patched_address) for node in self.pre_nodes]
-        post_nodes = [to_bytes(node.patched_address) for node in self.post_nodes]
         n.append(to_bytes(len(pre_nodes)))
         n.extend(pre_nodes)
+        post_nodes = [to_bytes(node.patched_address) for node in self.post_nodes]
         n.append(to_bytes(len(post_nodes)))
         n.extend(post_nodes)
         return n
@@ -89,6 +90,7 @@ class RBWriteInjector:
     ASM_LDM = () # ('ldm',)
     HOTSITE_MARKER = 'HOTSITEIDHERE'
     FORWARDEDGE_MARKER = 'FORWARDEDGELOCATION'
+    HOTSITE_FORMAT = '{}'
 
     def __init__(self, infile, outfile, cfg):
         self.infile = infile
@@ -111,8 +113,9 @@ class RBWriteInjector:
         # Address of the current instruction relative to the currunt function.
         self.curfunc_inst_offset = None
         # Keep track of the offset created by the instructions that have been injected.
-        self.injected_offset = 0;
+        self.injected_offset = 0
         self.main_func = 'main'
+        self.hotsitecounter = 1 # Start at 1, so we can use 0 for invalid ones.
 
     def add_src_and_dst_to_node(self, cfgnode):
         for edge in self.edges:
@@ -140,6 +143,8 @@ class RBWriteInjector:
         So any node before the PREVIOUS injection will already have been patched,
         with a lower injected_offset value. And wil not be touched again.
         """
+        if not curnode:
+            return
         for cfgnode in self.nodes:
             if cfgnode.patched_address == 0:
                 cfgnode.patched_address = cfgnode.bb_start + self.injected_offset
@@ -147,35 +152,33 @@ class RBWriteInjector:
                     break
 
 
-    def get_hotsite_address(self):
-        # Current instruction offset in function
-        address = self.curfunc_inst_offset
-        if self.curfunc_name in self.funcs.keys():
-            # Add address of function to offset
-            address += self.funcs[self.curfunc_name]
-        # Note: Functions not in the CFG get only the instruction offset.
-        # This can be detected as a CFG violation during execution checking
-        return address
-
     def get_hotsite_str(self):
-        HOTSITE_FORMAT = '{}'
-        return HOTSITE_FORMAT.format(self.get_hotsite_address())
+        node = self.get_curnode()
+        if not node:
+            return self.HOTSITE_FORMAT.format(0);
+        if node.hotsiteid is None:
+            node.hotsiteid = self.hotsitecounter
+            self.hotsitecounter += 1
+        return self.HOTSITE_FORMAT.format(node.hotsiteid)
+
+    def get_curnode(self):
+        if not self.curfunc_name in self.funcs:
+            # For functions not in CFG.
+            return None
+        curfunc_address = self.funcs[self.curfunc_name]
+        return self.node_from_address(curfunc_address + self.curfunc_inst_offset)
+
 
     def patch_upto_here(self):
         """ Set Node.patched_address for all nodes up-to-and-including this one,
             based on previously injected code.
         """
-        if not self.curfunc_name in self.funcs:
-            # Don't patch for functions not in CFG.
-            return
-        curfunc_address = self.funcs[self.curfunc_name]
-        curnode = self.node_from_address(curfunc_address + self.curfunc_inst_offset)
-        self.patch_up_to_node(curnode)
+        self.patch_up_to_node(self.get_curnode())
 
     def inject_branch(self, blx_target):
         self.patch_upto_here()
         if 'self.icode_branch' not in self.__dict__:
-            self.icode_branch = get_icode('dynamicpushpopinjectioncode.s')
+            self.icode_branch = get_icode('Call-C-Function-IndirectBranch.s')
         # Local copy specific to this location
         local_icode = self.icode_branch
         # Insert local forward edge address
@@ -203,14 +206,16 @@ class RBWriteInjector:
         # Set function name and reset instruction offset in function.
         self.curfunc_name = func_name
         self.curfunc_inst_offset = 0
-        #self.patch_upto_here()
+        self.patch_upto_here()
         # Inject code for main or generic function
-        #if self.curfunc_name == self.main_func:
-            #if 'icode_setup' not in self.__dict__:
-                #self.icode_setup = get_icode('dynamicpushpopinjectioncode.s')
+        if self.curfunc_name == self.main_func:
+            if 'icode_setup' not in self.__dict__:
+                self.icode_setup = get_icode('Call-C-Function-Setup.s')
             # Add to the injected instruction offset.
-            #self.injected_offset += self.instruction_offset * len(self.icode_setup.split('\n'))
-            #self.outfile.write(self.icode_setup.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
+            self.injected_offset += self.instruction_offset * len(self.icode_setup.split('\n'))
+            # Here we do not check get_curnode() for a None return value, because if the main function is not in
+            # the CFG, there is something so fundamentally wrong that the program may just crash and burn.
+            self.outfile.write(self.icode_setup.replace('MAINADDRESSHERE', '={}'.format(self.get_curnode().patched_address)))
         #else:
             #if 'icode_func_prologue' not in self.__dict__:
                 #self.icode_func_prologue = get_icode('pushpopinjectioncode.s')
@@ -221,11 +226,11 @@ class RBWriteInjector:
         # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
             if 'self.icode_teardown' not in self.__dict__:
-                self.icode_teardown = get_icode('dynamicpushpopinjectioncodeEpilogue.s')
+                self.icode_teardown = get_icode('Call-C-Function-Epilogue.s')
             self.outfile.write(self.icode_teardown.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         else:
             if 'self.icode_func_epilogue' not in self.__dict__:
-                self.icode_func_epilogue = get_icode('dynamicpushpopinjectioncodeEpilogue.s')
+                self.icode_func_epilogue = get_icode('Call-C-Function-Epilogue.s')
             self.outfile.write(self.icode_func_epilogue.replace(self.HOTSITE_MARKER, self.get_hotsite_str()))
         # Erase function name and instruction offset
         self.curfunc_name = None

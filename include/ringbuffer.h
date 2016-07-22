@@ -69,6 +69,10 @@ uint32_t *rb_writer_write;
 regval_t *rb_writer_buffer;
 /*! Global pointer to buffer end used to optimise the writer */
 regval_t *rb_writer_end;
+/*! Global variable to store the offset between the main function
+    in the CFG and the main function in reality. */
+int64_t cfg_offset;
+
 
 /*! Create a new ringbuffer
     \param  bufsize  The size of the ring buffer in bytes.
@@ -124,4 +128,14 @@ void rb_init_writer();
     This is a C function that can be branched to from assembly
     to write to the ringbuffer directly */
 void rb_write_attached(int arg0, int arg1);
+
+/*! Calculate the difference between the main function in the CFG
+    and the main function in reality.
+
+    Store this value in cfg_offset.
+    Call once during set-up of the program that writes to the
+    ringbuffer.
+    \param cfg_address Address of main in the CFG.
+    \param real_address Real address of main. */
+void setup(void *cfg_address, void *real_address);
 #endif
