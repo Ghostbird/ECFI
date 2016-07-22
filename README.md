@@ -73,37 +73,10 @@ make -B all
 LD_PRELOAD=bin/lib/libringbuffer.so bin/cfi-checker <path to executable>
 ```
 
-## Generate CFGs ##
-Example: Compile _src/injection-test.c_ and generate CFGs for all functions.
-```bash
-make cfg/injection-test.cfg
-```
-At the moment this creates a dummy _src/injection-test.c_ file and creates CFGs for every function compiled in the _cfg_ directory. The functions are in both DOT and SVG format.
-Note: If you want to cross-compile and generate CFGs you'll need the GCC Python plugin for your specific cross compiler. You'll probably have to compile it from source.
-
-### Python plugin caveat ###
-If you get an error like `cc1: error: fail to initialize plugin...` about the Python plugin, you must build the GCC python plugin exactly for your GCC version.
-
-You can try to do this by running the make target for the GCC-Python-plugin for example:
-```bash
-make gcc-6-python3-plugin
-```
-This will build **and install (system-wide)** the GCC-Python-plugin for GCC 6 and your system's default version of Python 3.
-
-To run the CFG generation for a specific combination of GCC and Python, run:
-```bash
-make -B cfg/<executable name>.cfg CC=<GCC executable> PYTHON=<Python executable> PYTHONPATH=<GCC's plugin directory>/\${PYTHON}
-```
-An example would be:
-```bash
-make -B cfg/injection-test.cfg CC=/usr/local/bin/gcc PYTHON=python PYTHONPATH=/usr/local/lib/gcc/x86_64-pc-linux-gnu/7.0.0/plugin/\${PYTHON}
-```
-This compiles the CFG for src/injection-test.c using a custom built GCC7 compiler at /usr/local/bin/gcc and the corresponding, presumably correctly compiled Python2.7 version of the GCC-Python-plugin.
-
-
-### Generate Dot File CFG from ANGR ###
-To generate CFG using angr, we need both angr and angrutils. Once we installed angr via pip, the angr will return error due to a bug in libcapstone. To fix this problem we must copy the libcapstone.so to the location where the error generated. 
-Once we installed angr, we must install the angrutils. After installation, we must change the visualize.py code of angrutils with newly modified angrutils code which generate CFG dot file instead of PNG files. To generate the dot file we will do the following:
+## Generate Dot File CFG from ANGR ##
+To generate CFG using angr, both angr and angrutils are required. It is recommended to install these in a virutalenv. The example below assumes that they are installed in a virtualenv named _angr_.
+The angr install through pip may return an error due to a bug in libcapstone. To fix this problem, search for libcapstone in the file tree indicated by the installer, and move it to the location where the installer says it is missing. 
+After the installation of both angr and angrutils, change the visualize.py code of angrutils with the modified angrutils code that generates CFG dot files instead of PNG files. To generate the dot file:
 ```bash
 workon angr
 ipython
@@ -118,7 +91,8 @@ start_state = proj.factory.blank_state(addr=main.addr)
 cfg = proj.analyses.CFGAccurate(fail_fast=True, enable_symbolic_back_traversal=True, starts=[main.addr], initial_state=start_state)
 plot_cfg(cfg, "ais3_cfg", asminst=True, remove_imports=True, remove_path_terminator=True)  
 ```
-The plot CFG will generate a file named test.dot which is the dot file of the CFG for BOFM binary.  
+The plot CFG will generate a file named test.dot which is the dot file of the CFG for the binary.
+
 ## Architecture ##
 Memory layout for ring buffer:
 
