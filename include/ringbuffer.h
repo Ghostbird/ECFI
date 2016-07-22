@@ -5,10 +5,10 @@
 
 /*! Size in memory of a ring buffer with WRITE_DATACOUNT×size entries.
 Take care that size is not allowed to be so big that it overflows the uint32_t maximum. */
-#define RB_MEMSIZE(size) ((uint32_t)((sizeof(ringbuffer_t) + (sizeof(regval_t) * size * WRITE_DATACOUNT))))
+#define RB_MEMSIZE(size) ((uint32_t)(sizeof(ringbuffer_t) + size))
 
 /*! This bit indicates that an override has happened. */
-#define RB_FLAG_OVERRIDE 0x01
+// Unused. #define RB_FLAG_OVERRIDE 0x01
 
 /*! Modulus calculation for positive divisors.
     - \a a The dividend
@@ -35,7 +35,7 @@ struct ringbuffer
     /*! The current write index */
     uint32_t write;
     /*! The flags */
-    unsigned char flags;
+    uint32_t flags;
 };
 
 /*! The ringbuffer_t typedef */
@@ -102,6 +102,7 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count);
     If this operation overwrites the read pointer it will increment the read pointer by WRITE_DATACOUNT.
     \param  data an array of data to write of size WRITE_DATACOUNT
     \param  rbptr  A pointer to the ring buffer to write to. CANNOT BE NULL.
+    \param  count  The number of regval_t * WRITE_DATACOUNT entries to read. Must be greater than zero.
     \return The pointer to the data array, NULL if the read failed.
 */
 void rb_write(ringbuffer_t *rbptr, const regval_t *data);

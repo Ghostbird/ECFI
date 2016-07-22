@@ -21,7 +21,7 @@ void checker(ringbuffer_info_t *rb_info, cfg_t *cfg)
     regval_t data[WRITE_DATACOUNT] = {0};
     if (cfg == NULL)
     {
-        fprintf(stderr, "No CFG data, no CFG checks will be performed.");
+        fprintf(stderr, "No CFG data, no CFG checks will be performed.\n");
     }
     fflush(NULL);
     /* Infinite loop */
@@ -30,9 +30,9 @@ void checker(ringbuffer_info_t *rb_info, cfg_t *cfg)
         /* Read all available data. */
         while (rb_read(rb_info->rb, data, WRITE_DATACOUNT) != NULL)
         {
-            //cfi_print(data);
-            //cfi_record(data);
-            cfi_check_record(data);
+            cfi_print(data);
+            cfi_record(data);
+            //cfi_check_record(data);
             if (cfg != NULL)
             {
                 cfi_validate_forward_edge(data, cfg);
@@ -106,12 +106,17 @@ int main(int argc, char *argv[])
         cfg_t *cfg;
         if (argc == 3)
         {
+            fprintf(stderr, "Loading CFG from %s\n", argv[2]);
             cfg = cfg_create(argv[2]);
             if (cfg == NULL)
             {
-                fprintf(stderr, "Checker: Failed to create CFG from %s", argv[2]);
+                fprintf(stderr, "Checker: Failed to create CFG from %s\n", argv[2]);
                 exit(EXIT_FAILURE);
             }
+        }
+        else
+        {
+            fprintf(stderr, "No CFG argument found. Cannot load CFG.\n");
         }
         fflush(NULL);
         /* We'll lose connection to the shell when the parent process exits.

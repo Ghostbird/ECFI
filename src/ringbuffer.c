@@ -59,7 +59,7 @@ ringbuffer_info_t *rb_create(uint32_t bufsize, const char *bufname)
         {
             if (mlock(rb, RB_MEMSIZE(bufsize)) == -1)
             {
-                fprintf(stderr, "rb_create(): Failed to lock buffer pages into memory. Performance may be suboptimal./n");
+                fprintf(stderr, "rb_create(): Failed to lock buffer pages into memory. Performance may be suboptimal.\n");
                 mlock_error_msg(errno);
             }
             /* Fill the struct with data */
@@ -180,7 +180,8 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
     int64_t upcast_write = (int64_t)rbptr->write;
     /* Upcast to avoid uint wrapping when rbptr->read + count > UINT32_MAX */
     int64_t upcast_read  = (int64_t)rbptr->read;
-    if ((uint32_t)(MOD((upcast_write - upcast_read), rbptr->size)) >= count)
+    /* Count is in objects of size sizeof(regval_t) whereas the calculation is in bytes */
+    if ((uint32_t)(MOD((upcast_write - upcast_read), rbptr->size)) >= count * sizeof(regval_t))
     {
         /* Copy register values one by one.
         Use remainder operation to wrap linear memory space.
@@ -188,8 +189,11 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
         for (uint32_t i = 0; i < count; i++)
         {
             /* (rbptr + 1) is a pointer to the memory directly behind that used by the struct rbptr.
-               That is where the real buffer begins. */
-            data[i] = ((regval_t*)(rbptr + 1))[(uint32_t)((upcast_read + i) % rbptr->size)];
+               That is where the real buffer begins. Cast it to regval_t*, to index the buffer.
+               Divide upcast_read and rbptr->size by sizeof(regval_t) to go from byte addressing to regval_t addressing.
+               This should be safe, since those values must always be a multiple of sizeof(regval_t)
+            */
+            data[i] = ((regval_t*)(rbptr + 1))[(uint32_t)((upcast_read / sizeof(regval_t) + i) % (rbptr->size / sizeof(regval_t)))];
         }
         /* Since reads are not atomic, and writes always go through, check whether no overwrite happened. */
         if (rbptr->read != (uint32_t)upcast_read)
@@ -199,7 +203,7 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
             return NULL;
         }
         /* Update read index. */
-        rbptr->read = (uint32_t)((upcast_read + count) % rbptr->size);
+        rbptr->read = (uint32_t)((upcast_read + count * sizeof(regval_t)) % rbptr->size);
     }
     else
     {
@@ -211,17 +215,20 @@ regval_t *rb_read(ringbuffer_t *rbptr, regval_t *data, uint32_t count)
 void rb_write(ringbuffer_t *rbptr, const regval_t *data)
 {
     /* (rbptr + 1) is a pointer to the memory directly behind that used by the struct rbptr.
-       That is where the real buffer begins. */
-    memcpy((void*) (((regval_t*)(rbptr + 1)) + rbptr->write), (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
+       That is where the real buffer begins.
+       Divide rbptr->write by sizeof(regval_t) to go from byte addressing to regval_t addressing.
+       This should be safe, since write offset is always a multiple of sizeof(regval_t)
+    */
+    memcpy((void*) (((regval_t*)(rbptr + 1)) + rbptr->write / sizeof(regval_t)), (void*) data, WRITE_DATACOUNT * sizeof(regval_t));
     /* Update write index. */
-    rbptr->write += WRITE_DATACOUNT;
+    rbptr->write += WRITE_DATACOUNT * sizeof(regval_t);
     /* Fix write index if it's beyond the size of the buffer. */
     if (rbptr->write == rbptr->size)
 	rbptr->write -= rbptr->size;
     /* Fix read index if it is an overwrite.
     It will point to one write operation in advance of the write index. */
     if (rbptr->write == rbptr->read)
-	rbptr->read += WRITE_DATACOUNT;
+	rbptr->read += WRITE_DATACOUNT * sizeof(regval_t);
     return;
 }
 
@@ -267,15 +274,25 @@ void rb_init_writer()
 
 void rb_write_attached(int arg0, int arg1)
 {
-    regval_t* write_offset = rb_writer_buffer + *rb_writer_write;
-    write_offset[0] = arg0;
-    write_offset[1] = arg1;
-    write_offset += WRITE_DATACOUNT;
+    /* Divide *rb_write_write by sizeof(regval_t) because *rb_writer_write holds an
+    offset in bytes, and C pointer arithmetic wants it in sizeof(regval_t) */
+    regval_t* write_location = rb_writer_buffer + *rb_writer_write / sizeof(regval_t);
+    write_location[0] = arg0;
+    write_location[1] = arg1;
+    //fprintf(stderr, "Wrote %08x, %08x to %p\n", arg0, arg1, (void*)write_location);
+    regval_t *new_write_location = write_location + WRITE_DATACOUNT;
+    //fprintf(stderr, "Location for new write: %p\n", (void*) new_write_location);
     /* Wrap linear memory space. */
-    if (write_offset == rb_writer_end)
-        write_offset = rb_writer_buffer;
+    if (new_write_location == rb_writer_end)
+        new_write_location = rb_writer_buffer;
     /* Kick forward the read pointer on an overwrite. */
-    if (rb_writer_buffer + *rb_writer_read == write_offset)
-        *rb_writer_read = (uint32_t)(write_offset - rb_writer_buffer) + WRITE_DATACOUNT;
-    *rb_writer_write = (uint32_t)(write_offset - rb_writer_buffer);
+    if (rb_writer_buffer + *rb_writer_read == new_write_location)
+        *rb_writer_read = (uint32_t)(new_write_location - rb_writer_buffer) + WRITE_DATACOUNT;
+    /* This line confused me for a while. The difference between two pointers is calculated
+    as how many objects of the pointer's type fit inbetween. NOT IN BYTES!
+    Multiply by sizeof(regval_t) to get it in bytes. */
+    *rb_writer_write = (uint32_t)(new_write_location - rb_writer_buffer) * sizeof(regval_t);
+    //fprintf(stderr, "sizeof(regval_t) = %x\n", sizeof(regval_t));
+    //fprintf(stderr, "rb_writer_buffer: %p\n", (void*)rb_writer_buffer);
+    //fprintf(stderr, "rb_writer_write: %08x\n", *rb_writer_write);
 }

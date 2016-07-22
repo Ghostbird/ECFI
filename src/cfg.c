@@ -85,19 +85,19 @@ char cfg_validate_jump(const cfg_t *cfg, const cfg_int hotsite, const cfg_int ta
         {
             bblock_address = cfg->data[i]->address;
             bblock = i;
-            fprintf(stderr, "Found block %i:%x for hotsite %x.\n", bblock, bblock_address, hotsite);
+            fprintf(stderr, "Found possible block %i:%x for hotsite %x.\n", bblock, bblock_address, hotsite);
         }
     }
     for (cfg_int i = 0; i < cfg->data[bblock]->post_size; i++)
     {
         if (cfg->data[bblock]->post_data[i] == target)
         {
-            fprintf(stderr, "Found valid edge %x -> %x.", hotsite, target);
+            fprintf(stderr, "Found valid edge %x -> %x\n", hotsite, target);
             fflush(stderr);
             return 1;
         }
     }
-    fprintf(stderr, "Could not validate edge %x -> %x.", hotsite, target);
+    fprintf(stderr, "Could not validate edge %x -> %x\n", hotsite, target);
     fflush(stderr);
     return 0;
 }

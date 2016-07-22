@@ -201,9 +201,10 @@ char test_destroy()
 
 char test_read()
 {
-    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
     fflush(NULL);
+    /* Flush to prevent stdout and stderr to desynchronise between test cases. */
     printf("Testing read functionality... ");
+    fflush(NULL);
     char success = TRUE;
     ringbuffer_info_t *rb_info = rb_create(1024, BUFNAME);
     ringbuffer_t *rb = rb_info->rb;
@@ -240,13 +241,13 @@ char test_read()
         fprintf(stderr, "Read beyond write pointer\n");
         success = FALSE;
     }
-    rb->write = datacount - 1;
+    rb->write = datacount * sizeof(regval_t) - 1;
     if (rb_read(rb,data,datacount) != NULL)
     {
         fprintf(stderr, "Partial read beyond write pointer\n");
         success = FALSE;
     }
-    rb->write = datacount;
+    rb->write = datacount * sizeof(regval_t);
     if (rb_read(rb,data,datacount) == NULL)
     {
         fprintf(stderr, "Failed to read exactly to write pointer\n");
@@ -260,41 +261,41 @@ char test_read()
             success = FALSE;
         }
     }
-    if (rb->read != datacount)
+    if (rb->read != datacount * sizeof(regval_t))
     {
-        fprintf(stderr, "Detected failure to update read index");
+        fprintf(stderr, "Detected failure to update read index\n");
         success = FALSE;
     }
     rb->write = 0;
     if (rb_read(rb,data,datacount) == NULL)
     {
-        fprintf(stderr, "Failed to read while ahead of write pointer");
+        fprintf(stderr, "Failed to read while ahead of write pointer\n");
         success = FALSE;
     }
     for (uint32_t i = 0; i < datacount; i++)
     {
         if (data[i] != i + datacount)
         {
-            fprintf(stderr, "Incorrect values found expected %d, got %d instead", i + datacount, data[i]);
+            fprintf(stderr, "Incorrect values found expected %d, got %d instead\n", i + datacount, data[i]);
             success = FALSE;
         }
     }
-    if (rb->read != datacount * 2)
+    if (rb->read != datacount * sizeof(regval_t) * 2)
     {
         fprintf(stderr, "Detected failure to update read index a second time\n");
         success = FALSE;
     }
     rb->read = 0;
     free(data);
-    datacount = rb->size;
-    data = malloc(datacount * sizeof(regval_t));
+    datacount = rb->size / sizeof(regval_t);
+    data = malloc(rb->size);
     if (data == NULL)
     {
         fprintf(stderr, "Failed to allocate of test memory, aborting! (2)\n");
         rb_destroy(rb_info);
         return FALSE;
     }
-    if (rb_read(rb, data, rb->size) != NULL)
+    if (rb_read(rb, data, datacount) != NULL)
     {
         fprintf(stderr, "Incorrectly read entire buffer of old data\n");
         success = FALSE;
@@ -410,5 +411,5 @@ char test_write()
 
 int main(void)
 {
-    return !(test_create(1) && test_destroy() && test_create(1024) && test_create(1024*1024) && test_create_zero() && test_create_noname() /*&& test_create_nomem()*/ && test_read() && test_write());
+    return !(test_create(1 * sizeof(regval_t)) && test_destroy() && test_create(1024 * sizeof(regval_t)) && test_create(1024*1024*sizeof(regval_t)) && test_create_zero() && test_create_noname() /*&& test_create_nomem()*/ && test_read() && test_write());
 }
