@@ -1,3 +1,5 @@
+#ifndef RINGBUFFER_INCLUDEONCE //Guard against double includes
+#define RINGBUFFER_INCLUDEONCE
 #include <inttypes.h>
 
 /*! Amount of regval_t entries in a buffer field. */
@@ -122,3 +124,4 @@ void rb_init_writer();
     This is a C function that can be branched to from assembly
     to write to the ringbuffer directly */
 void rb_write_attached(int arg0, int arg1);
+#endif
