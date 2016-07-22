@@ -297,7 +297,7 @@ void rb_write_attached(int arg0, int arg1)
     //fprintf(stderr, "rb_writer_write: %08x\n", *rb_writer_write);
 }
 
-void setup(void *cfg_address, void *real_address)
+void cfg_setup(void *cfg_address, void *real_address)
 {
     cfg_offset = (unsigned int)cfg_address - (unsigned int)real_address;
 }

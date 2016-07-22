@@ -215,7 +215,7 @@ class RBWriteInjector:
             self.injected_offset += self.instruction_offset * len(self.icode_setup.split('\n'))
             # Here we do not check get_curnode() for a None return value, because if the main function is not in
             # the CFG, there is something so fundamentally wrong that the program may just crash and burn.
-            self.outfile.write(self.icode_setup.replace('MAINADDRESSHERE', '={}'.format(self.get_curnode().patched_address)))
+            self.outfile.write(self.icode_setup.replace('MAINADDRESSHERE', '{}'.format(self.get_curnode().patched_address)))
         #else:
             #if 'icode_func_prologue' not in self.__dict__:
                 #self.icode_func_prologue = get_icode('pushpopinjectioncode.s')

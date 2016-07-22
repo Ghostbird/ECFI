@@ -137,5 +137,5 @@ void rb_write_attached(int arg0, int arg1);
     ringbuffer.
     \param cfg_address Address of main in the CFG.
     \param real_address Real address of main. */
-void setup(void *cfg_address, void *real_address);
+void cfg_setup(void *cfg_address, void *real_address);
 #endif
