@@ -102,6 +102,12 @@ Activity diagram of the CFI-Checker.
 
 ![Please read src/cfi-checker.c if you cannot see this picture.](doc/diagrams/cfi-checker_activity.png "Activity diagram that shows how the processes interact.")
 
+### ASLR compensation ###
+The injected set-up code from injectioncode/Call-C-Function-Setup.s calls the function cfg_setup() from include/ringbuffer.h and passes two arguments.
+These arguments are:
+# The address of main() during injection.
+# The address of main() at run-time.
+
 ## Optimisation points:
 - Use thread instead of separate process for the checker
 
