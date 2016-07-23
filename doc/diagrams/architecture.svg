@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="28cm" height="18cm" viewBox="439 127 542 341" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="36cm" height="22cm" viewBox="273 47 708 421" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <ellipse style="fill: #ffffff" cx="736.724" cy="410.088" rx="56.724" ry="56.724"/>
     <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="736.724" cy="410.088" rx="56.724" ry="56.724"/>
@@ -52,11 +52,11 @@
     <tspan x="826.724" y="420.038"></tspan>
   </text>
   <g>
-    <rect style="fill: #ffffff" x="710" y="300" width="80" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="710" y="300" width="80" height="20"/>
+    <rect style="fill: #ffffff" x="708" y="300" width="80" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="708" y="300" width="80" height="20"/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="750" y="314.45">
-    <tspan x="750" y="314.45">heuristic</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="748" y="314.45">
+    <tspan x="748" y="314.45">heuristic</tspan>
   </text>
   <g>
     <rect style="fill: #ffffff" x="800" y="300" width="70" height="20"/>
@@ -103,47 +103,47 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,347.764 520,357.764 525,347.764 "/>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="670" y="180" width="160" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="670" y="180" width="160" height="20"/>
+    <rect style="fill: #ffffff" x="668" y="100" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="668" y="100" width="160" height="20"/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="750" y="191.9">
-    <tspan x="750" y="191.9">CFG Generator</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="748" y="111.9">
+    <tspan x="748" y="111.9">CFG Generator</tspan>
   </text>
   <g>
-    <rect style="fill: #ffffff" x="670" y="240" width="160" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="670" y="240" width="160" height="20"/>
+    <rect style="fill: #ffffff" x="668" y="240" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="668" y="240" width="160" height="20"/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="750" y="251.9">
-    <tspan x="750" y="251.9">Control Flow Graph</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="748" y="251.9">
+    <tspan x="748" y="251.9">Control Flow Graph 2</tspan>
   </text>
   <g>
-    <rect style="fill: #ffffff" x="440" y="180" width="160" height="20"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="180" width="160" height="20"/>
+    <rect style="fill: #ffffff" x="440" y="100" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="100" width="160" height="20"/>
   </g>
-  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="520" y="191.9">
-    <tspan x="520" y="191.9">Program assembly</tspan>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="520" y="111.9">
+    <tspan x="520" y="111.9">Program assembly</tspan>
   </text>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="600.933" y1="190" x2="665.528" y2="190"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="657.764,195 667.764,190 657.764,185 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="600.974" y1="110" x2="663.528" y2="110"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="655.764,115 665.764,110 655.764,105 "/>
   </g>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="200" x2="520" y2="235.528"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="120" x2="520" y2="235.528"/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,227.764 520,237.764 525,227.764 "/>
   </g>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="750" y1="200.999" x2="750" y2="235.528"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="745,227.764 750,237.764 755,227.764 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="748" y1="120.999" x2="748" y2="155.528"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="743,147.764 748,157.764 753,147.764 "/>
   </g>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="669.067" y1="250" x2="604.472" y2="250"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="612.236,245 602.236,250 612.236,255 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="600" y1="250" x2="663.528" y2="250"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="655.764,255 665.764,250 655.764,245 "/>
   </g>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="750" y1="299.102" x2="750" y2="260.898"/>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="819.561" y1="299.102" x2="765.439" y2="260.898"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="748" y1="299.102" x2="748" y2="260.898"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="819.197" y1="299.102" x2="763.803" y2="260.898"/>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="867.352" y1="379.092" x2="772.541" y2="323.271"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="781.768,322.901 770.614,322.137 776.695,331.519 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="866.733" y1="379.092" x2="770.772" y2="323.251"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="779.998,322.835 768.84,322.127 774.968,331.478 "/>
   </g>
   <g>
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="893.676" y1="379.092" x2="847.238" y2="324.411"/>
@@ -153,12 +153,32 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="920" y1="379.092" x2="920" y2="325.474"/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="925,333.238 920,323.238 915,333.238 "/>
   </g>
-  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="889.121" y1="299.102" x2="780.879" y2="260.898"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" x1="888.758" y1="299.102" x2="779.242" y2="260.898"/>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="150" x2="520" y2="175.528"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="130" x2="520" y2="134"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="136.667" x2="520" y2="140.667"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="143.333" x2="520" y2="147.333"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,167.764 520,177.764 525,167.764 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="70" x2="520" y2="95.5279"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="50" x2="520" y2="54"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="56.6667" x2="520" y2="60.6667"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="520" y1="63.3333" x2="520" y2="67.3333"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,87.7639 520,97.7639 525,87.7639 "/>
   </g>
+  <g>
+    <rect style="fill: #ffffff" x="668" y="160" width="160" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="668" y="160" width="160" height="20"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="748" y="171.9">
+    <tspan x="748" y="171.9">Control Flow Graph</tspan>
+  </text>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="668,170 520,170 520,235.528 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="515,227.764 520,237.764 525,227.764 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" points="440,310 419,310 419,250 435.528,250 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="427.764,255 437.764,250 427.764,245 "/>
+  </g>
+  <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="273" y="262.5">
+    <tspan x="273" y="262.5">Proposed solution:</tspan>
+    <tspan x="273" y="278.5">Function offsets from</tspan>
+    <tspan x="273" y="294.5">assembled program</tspan>
+  </text>
 </svg>
