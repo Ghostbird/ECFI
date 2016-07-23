@@ -109,6 +109,48 @@ These arguments are:
 # The address of main() at run-time.
 These two are used to calculate the offset between the addresses in the cfg and the addresses at runtime. This offset is stored in the global variable cfg_offset.
 
+### Hotsite ID ###
+The hotsite ID is a number given to a location where code is injected into the assembly. The hotsite ID is used to determine where in the CFG the execution is.
+The hotsite ID is a multiple of 8, plus a suffix of 0-7. The hotsite ID is stored in the binary CFG, but the last three bits are all zeroes in there.
+The lowest three bits of the hotsite are used to determine the type of the control flow transfer. With three bits, currenlty eight different transfers can be
+distinguished, but only two are used so far:
+ 0 - Indirect branch (BLX <something>)
+ 1 - Return from a function (function epilogue)
+
+### Binary CFG ###
+The binary CFG used at runtime is defined in include/cfg.h and shown in diagrams/binary-cfg.svg
+
+### CFG Checking ###
+The function _checker_ in cfi-checker.c continuously reads data from the ringbuffer when available. It passes this data to a number of functions.
+Currently these are:
+- cfi_print (just prints ringbuffer data to stdout, which is redirected to the file checker.out) Used for debugging.
+- cfi_record (literally record the contents of the ringbuffer during execution to a file name _record_)
+- cfi_check_record (check the literal record in the file _record_ and print to stderr (redirected to checker.err) if it doesn't match exactly)
+- cfi_validate_forward_edge (check whether the loaded cfg contains a valid entry for the passed hotsite ID and target. UNFINISHED)
+
+cfi_validate_forward_edge calls the cfg_validate_jump function from src/cfg.c which does this:
+
+(NOTE: Part of this is broken at the moment)
+
+Iterate over all cfgblock structs in the cfg struct:
+
+If the hotsite ID (minus the lowest three bits (transfer type identification)) of the current cfgnode matches the hotsite argument that was passed:
+
+Iterate over the post_data in the cfgnode struct, and declare the transfer valid if a match is found.
+Otherwise declare the transfer invalid.
+
+If after reaching the end of the binary CFG, no matching cfgnode is found, the transfer is declared invalid too.
+
+## Recommendations for my successor. ##
+The current problem is to get the correct _target_ (aka. post_data) values in the binary CFG:
+# Adapt the cfi_record method so that it writes the hotsite_IDs and the jump targets MINUS the global cfg_offset.
+# Run the application once.
+# Use the values in the file _record_ to rewrite the binary CFG.
+
+For the next runs that use validation, disable cfi_record functionality and:
+# In the cfg_validate_jump function, subtract the global cfg_offset variable (which is different for this run due to ASLR) from the _target_ argument.
+# Compare with the value in the CFG (which will be the value of the target in a jump minus the cfg_offset for THAT run, so the values should match).
+
 ## Optimisation points:
 - Use thread instead of separate process for the checker
 
