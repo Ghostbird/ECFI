@@ -64,7 +64,7 @@ class CFGNode():
         self.post_nodes = []
 
     def byte_repr(self):
-        n = [to_bytes(self.patched_address)]
+        n = [to_bytes(self.hotsiteid)]
         pre_nodes = [to_bytes(node.patched_address) for node in self.pre_nodes]
         n.append(to_bytes(len(pre_nodes)))
         n.extend(pre_nodes)
@@ -99,10 +99,9 @@ class RBWriteInjector:
         self.nodes = sorted([CFGNode(node) for node in cfg.get_nodes()])
         self.edges = cfg.get_edges()
         self.reverse_node_lookup = {cfgnode.node.obj_dict['name']:cfgnode for cfgnode in self.nodes}
-        for cfgnode in self.nodes:
-            self.add_src_and_dst_to_node(cfgnode)
         self.funcs = {}
-        for cfgnode in self.nodes:
+        for i,cfgnode in enumerate(self.nodes, start=1):
+            cfgnode.hotsiteid = i
             self.funcs[cfgnode.func_name] = cfgnode.func_addr
         first_inst_addr = int(self.nodes[0].instructions[0].partition(':')[0], 16)
         second_inst_addr = int(self.nodes[0].instructions[1].partition(':')[0], 16)
@@ -115,7 +114,6 @@ class RBWriteInjector:
         # Keep track of the offset created by the instructions that have been injected.
         self.injected_offset = 0
         self.main_func = 'main'
-        self.hotsitecounter = 1 # Start at 1, so we can use 0 for invalid ones.
 
     def add_src_and_dst_to_node(self, cfgnode):
         for edge in self.edges:
@@ -156,9 +154,6 @@ class RBWriteInjector:
         node = self.get_curnode()
         if not node:
             return self.HOTSITE_FORMAT.format(0);
-        if node.hotsiteid is None:
-            node.hotsiteid = self.hotsitecounter
-            self.hotsitecounter += 1
         return self.HOTSITE_FORMAT.format(node.hotsiteid)
 
     def get_curnode(self):
@@ -205,7 +200,8 @@ class RBWriteInjector:
     def func_prologue(self, func_name):
         # Set function name and reset instruction offset in function.
         self.curfunc_name = func_name
-        self.curfunc_inst_offset = 0
+        # We've already written the PUSH instruction at the start of the function. So set this to one instruction offset.
+        self.curfunc_inst_offset = self.instruction_offset
         self.patch_upto_here()
         # Inject code for main or generic function
         if self.curfunc_name == self.main_func:
@@ -270,6 +266,9 @@ class RBWriteInjector:
                     while lines[line_nr].strip().startswith('@'):
                         self.outfile.write(lines[line_nr])
                         line_nr += 1
+                    # Write the PUSH instruction at the start of the function before injected code.
+                    self.outfile.write(lines[line_nr])
+                    line_nr += 1
                     self.func_prologue(splitline[0][:-1])
                     # Immediately process next line.
                     continue
@@ -304,6 +303,8 @@ class RBWriteInjector:
         self.parse_file()
 
     def write_binary_cfg(self):
+        for cfgnode in self.nodes:
+            self.add_src_and_dst_to_node(cfgnode)
         data = [to_bytes(len(self.nodes))]
         for node in self.nodes:
             data.extend(node.byte_repr())
