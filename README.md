@@ -107,6 +107,7 @@ The injected set-up code from injectioncode/Call-C-Function-Setup.s calls the fu
 These arguments are:
 # The address of main() during injection.
 # The address of main() at run-time.
+These two are used to calculate the offset between the addresses in the cfg and the addresses at runtime. This offset is stored in the global variable cfg_offset.
 
 ## Optimisation points:
 - Use thread instead of separate process for the checker
