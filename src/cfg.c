@@ -5,6 +5,8 @@
 #include <stdio.h> /* fprintf and stderr */
 #include <stdlib.h> /* malloc and free */
 
+cfg_int hotsite_type_bitmask = 0x07;
+
 cfg_t *cfg_create(char* path)
 {
     // Open file
@@ -58,9 +60,9 @@ cfg_t *cfg_create(char* path)
             // Iterate over pre_data
             for (cfg_int j = 0; j < cfg->data[i]->post_size; j++)
             {
-                // Read next value from file into pre_data[j]
+                // Read next value from file into post_data[j]
                 fread((void*)(cfg->data[i]->post_data + j), sizeof(cfg_int), 1, file);
-                fprintf(stderr, "Post-target %i: %i\n", j, cfg->data[i]->pre_data[j]);
+                fprintf(stderr, "Post-target %i: %i\n", j, cfg->data[i]->post_data[j]);
             }
         }
     }
@@ -94,25 +96,19 @@ char cfg_validate_jump(const cfg_t *cfg, const cfg_int hotsite, const cfg_int ta
         // Check whether the current block is the relevant one.
         if (cfg->data[i]->hotsiteid == hotsite)
         {
-            // Iterate over post_data in block.
-            for (cfg_int j = 0; j < cfg->data[i]->post_size; j++)
+            fprintf(stderr, "Found matching hotsite id in CFG for hotsite %i\n", hotsite);
+            cfg_int hotsite_type = hotsite & hotsite_type_bitmask;
+            switch (hotsite_type)
             {
-                // Is this subtraction always safe?
-                if (cfg->data[i]->post_data[j] - cfg_offset == target)
-                {
-                    fprintf(stderr, "Found validated edge from hotsite %08x to address %08x.\n", hotsite, target);
-                    fflush(stderr);
-                    return 1;
-                }
-                else
-                {
-                    fprintf(stderr, "Edge from hotsite %08x -> address %08x does not match target %08x.\n", hotsite, cfg->data[i]->post_data[j], target);
-                }
-
+                case 0:
+                break;
+                case 1:
+                break;
+                default:
+                fprintf(stderr, "Hotsite type is unknown!\n");
             }
-            // We've checked the relevant block, but no matching post_data was found.
-            // Looking any further is no use, so break the loop and run the last part of the function.
-            break;
+            fprintf(stderr, "Validation of the jump target is not yet supported!");
+            return 1;
         }
     }
     // The loop has ended, so no matching edge has been found.
