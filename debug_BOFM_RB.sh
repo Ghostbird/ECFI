@@ -5,7 +5,7 @@ make DEBUG=-ggdb bin/cfi-checker
 #remake=$?
 #if [ $remake -eq 1 ]:
 #then
-    make asm/BOFM_RB.s DEBUG=-ggdb
+    make asm/BOFM_RB.s
     python3 injector.py asm/BOFM_RB.s dot/BOFM_RB.dot asm/BOFM_RBi.s
     make DEBUG=-ggdb asm_to_bin/BOFM_RBi
 #fi
