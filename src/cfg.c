@@ -51,7 +51,7 @@ cfg_t *cfg_create(char* path)
         }
         // Read next value out of file into post_size for this block.
         fread((void*)&(cfg->data[i]->post_size), sizeof(cfg_int), 1, file);
-        fprintf(stderr, "Number of post-nodes: %i\n", cfg->data[i]->pre_size);
+        fprintf(stderr, "Number of post-nodes: %i\n", cfg->data[i]->post_size);
         // Check for presence of post_data in file
         if (cfg->data[i]->post_size > 0)
         {
@@ -66,6 +66,7 @@ cfg_t *cfg_create(char* path)
             }
         }
     }
+    fprintf(stderr, "Finished reading CFG.\n");
     // TODO Verify that read has reached EOF.
     return cfg;
 }
@@ -93,21 +94,25 @@ char cfg_validate_jump(const cfg_t *cfg, const cfg_int hotsite, const cfg_int ta
     // Iterate over bblocks.
     for (cfg_int i = 0; i < cfg->size; i++)
     {
+        // Reverse mask the hotsiteid to keep only the blockid.
+        cfg_int pure_hotsite = hotsite & (~hotsite_type_bitmask);
         // Check whether the current block is the relevant one.
-        if (cfg->data[i]->hotsiteid == hotsite)
+        if (cfg->data[i]->hotsiteid == pure_hotsite)
         {
             fprintf(stderr, "Found matching hotsite id in CFG for hotsite %i\n", hotsite);
             cfg_int hotsite_type = hotsite & hotsite_type_bitmask;
             switch (hotsite_type)
             {
                 case 0:
+                fprintf(stderr, "Control flow transfer is a BLX\n");
                 break;
                 case 1:
+                fprintf(stderr, "Control flow transfer is a function epilogue\n");
                 break;
                 default:
                 fprintf(stderr, "Hotsite type is unknown!\n");
             }
-            fprintf(stderr, "Validation of the jump target is not yet supported!");
+            fprintf(stderr, "Validation of the jump target is not yet supported!\n");
             return 1;
         }
     }
