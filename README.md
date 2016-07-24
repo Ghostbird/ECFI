@@ -143,14 +143,19 @@ If after reaching the end of the binary CFG, no matching cfgnode is found, the t
 
 ## Recommendations for my successor. ##
 The current problem is to get the correct _target_ (aka. post_data) values in the binary CFG:
-# Adapt the cfi_record method so that it writes the hotsite_IDs and the jump targets MINUS the global cfg_offset.
-# Run the application once.
-# Use the values in the file _record_ to rewrite the binary CFG.
-
-For the next runs that use validation, disable cfi_record functionality and:
-# In the cfg_validate_jump function, subtract the global cfg_offset variable (which is different for this run due to ASLR) from the _target_ argument.
-# Compare with the value in the CFG (which will be the value of the target in a jump minus the cfg_offset for THAT run, so the values should match).
-
+Ali has suggested that after the RBWriteInjector.run() call in injector.py:
+1. Grab the set of function names: `set(injector.funcs.keys()`
+2. Compile the _outfile_
+3. Run the resulting binary in gdb:
+   `import subprocess`
+   `gdb = subprocess.Popen(['gdb', '<name-of-binary>'])`
+4. Use `gdb.communicate()` to query the addresses for each function in the binary.
+5. Also query gdb for the value of the global variable `cfg_offset` (note, step a few times, it's set in the first function call in `main()`.
+6. For each CFGNode in injector.nodes:
+   Find the functions that it can jump to in the CFG.
+   Write the function address MINUS the value of _cfg.offset_ for these functions to CFGNode.post_nodes
+7. Write the binary CFG data to file.
+8. Change cfg.c:validate_jump to subtract the global cfg.offset from the target value before comparison with the values in the binary cfg.
 ## Optimisation points:
 - Use thread instead of separate process for the checker
 
