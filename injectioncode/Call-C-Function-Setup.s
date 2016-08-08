@@ -1,6 +1,7 @@
-        PUSH    {r0, r1}             @
-        SUB     r1, pc, #4           @ Subtract 4 from PC to get start of main.
-        LDR	r0, =MAINADDRESSHERE @ Main address in CFG injected here.
-        BL      [cfg_setup]          @ Execute function cfg_offset
-        BL      [rb_init_writer]     @ Execute function rb_init_writer
-        POP	{r0, r1}             @
+        PUSH    {r0, r1, r3}
+        BL      rb_init_writer
+        LDR     R0, =10
+        LDR     r1, =[main]
+        LDR     r3, =rb_write_attached
+        BLX     r3
+        POP     {r0, r1, r3}
