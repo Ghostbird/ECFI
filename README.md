@@ -144,6 +144,7 @@ If after reaching the end of the binary CFG, no matching cfgnode is found, the t
 ## Recommendations for my successor. ##
 The current problem is to get the correct _target_ (aka. post_data) values in the binary CFG:
 Ali has suggested that after the RBWriteInjector.run() call in injector.py:
+
 1. Grab the set of function names: `set(injector.funcs.keys()`
 2. Compile the _outfile_
 3. Run the resulting binary in gdb:
