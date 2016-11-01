@@ -157,6 +157,7 @@ Ali has suggested that after the RBWriteInjector.run() call in injector.py:
    Write the function address MINUS the value of _cfg.offset_ for these functions to CFGNode.post_nodes
 7. Write the binary CFG data to file.
 8. Change cfg.c:validate_jump to subtract the global cfg.offset from the target value before comparison with the values in the binary cfg.
+
 ## Optimisation points:
 - Use thread instead of separate process for the checker
 
