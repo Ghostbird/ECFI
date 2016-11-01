@@ -105,8 +105,8 @@ Activity diagram of the CFI-Checker.
 ### ASLR compensation ###
 The injected set-up code from injectioncode/Call-C-Function-Setup.s calls the function cfg_setup() from include/ringbuffer.h and passes two arguments.
 These arguments are:
-# The address of main() during injection.
-# The address of main() at run-time.
+- The address of main() during injection.
+- The address of main() at run-time.
 These two are used to calculate the offset between the addresses in the cfg and the addresses at runtime. This offset is stored in the global variable cfg_offset.
 
 ### Hotsite ID ###
